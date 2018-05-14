@@ -1,0 +1,97 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'cpp'
+
+buildscript {
+    ext.kotlin_version = '1.2.30'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+group 'com.github.jeffreystoke'
+version '0.0.1-alpha'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+model {
+    winsock_jni(NativeLibrarySpec) {
+        sources {
+            cpp {
+                lib library: 'winsock', linkage: 'shared'
+                source {
+                    srcDir 'src/main/jni'
+                    include "**/*.cpp"
+                }
+            }
+        }
+
+        binaries.withType(SharedLibraryBinarySpec) {
+            cppCompiler.define 'WIN32'
+            cppCompiler.define '_WINDOWS'
+            cppCompiler.define '_USRDLL'
+            cppCompiler.define '_WINDLL'
+            cppCompiler.define '_UNICODE'
+            cppCompiler.define 'UNICODE'
+            cppCompiler.define '_EXPORTING'
+
+            cppCompiler.define 'NDEBUG'
+            cppCompiler.args '/Zi', '/nologo', '/W3', '/WX-', '/sdl', '/O2', '/Oi', '/GL', '/Gm-', '/EHsc', '/MD', '/GS', '/Gy', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/TP'
+            if (targetPlatform == platforms.x64) {
+                linker.args '/INCREMENTAL:NO', '/NOLOGO', '/MANIFEST', '/manifest:embed', '/DEBUG', '/SUBSYSTEM:WINDOWS', '/OPT:REF', '/OPT:ICF', '/TLBID:1', '/DYNAMICBASE', '/NXCOMPAT', '/MACHINE:X64', '/DLL', '/LTCG'
+            } else {
+                linker.args '/INCREMENTAL:NO', '/NOLOGO', '/MANIFEST', '/manifest:embed', '/DEBUG', '/SUBSYSTEM:WINDOWS', '/OPT:REF', '/OPT:ICF', '/TLBID:1', '/DYNAMICBASE', '/NXCOMPAT', '/MACHINE:X86', '/DLL', '/LTCG'
+            }
+        }
+    }
+    platforms {
+        windows_x86 {
+            architecture 'x86'
+            operatingSystem 'windows'
+        }
+        windows_x64 {
+            architecture 'x86_64'
+            operatingSystem 'windows'
+        }
+    }
+    repositories {
+        libs(PrebuiltLibraries) {
+            winsock {
+                headers.srcDir "contrib/cpprest/include"
+                binaries.withType(SharedLibraryBinary) {
+                    root = System.getenv("SystemRoot")
+                    sharedLibraryFile = file("${root}/winsock.dll")
+                    sharedLibraryLinkFile = file("${root}/winsock.lib")
+                }
+            }
+        }
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
