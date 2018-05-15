@@ -12,7 +12,7 @@ Give a try for using Java to do something windows native, and learn windows IO m
 
 - Windows native socket (done)
 - Select IO Model (done)
-- WSAAsyncSelect Model (done)
+- WSAAsyncSelect Model (Not Supported)
 - WSAEventSelect Model (done)
 - Overlapped IO Model (in progress)
 - Completion Port (in progress)
@@ -22,6 +22,10 @@ Give a try for using Java to do something windows native, and learn windows IO m
 ```bash
 ./gradlew jar
 ```
+
+## Note
+
+For Windows Platform only
 
 ## LICENSE
 

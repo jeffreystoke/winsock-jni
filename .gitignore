@@ -1,8 +1,8 @@
 /.gradle
 /.idea
-/.vscode
 /.settings
-/bin
 /.project
 /.classpath
+/src/test
+/bin
 /build
