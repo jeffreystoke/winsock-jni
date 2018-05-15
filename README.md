@@ -2,6 +2,8 @@
 
 JNI Wrapper for WinSock API (under heavy development)
 
+[中文](./README-CN.md)
+
 ## Purpose
 
 Give a try for using Java to do something windows native, and learn windows IO model in depth.
@@ -12,16 +14,23 @@ Give a try for using Java to do something windows native, and learn windows IO m
 
 - Windows native socket (done)
 - Select IO Model (done)
-- WSAAsyncSelect Model (Not Supported)
 - WSAEventSelect Model (done)
 - Overlapped IO Model (in progress)
 - Completion Port (in progress)
 
+Note: WSAAsyncSelect is NOT supported, cause it requires WinMain as its entrance
+
+## Usage
+
+// TODO
+
 ## Build
 
-```bash
-./gradlew jar
-```
+0. Get Visual Studio installed
+1. Modify `build.gradle`, change `libs->winsock->headers.srcDir` and other path to match your own system
+2. run  `./gradlew assemble` within command line interface
+
+Gradle will download essential packages and build, output dir is `build/libs`
 
 ## Note
 
