@@ -3,6 +3,8 @@
 /.settings
 /.project
 /.classpath
+/out
 /src/test
 /bin
 /build
+winsock-jni.iml

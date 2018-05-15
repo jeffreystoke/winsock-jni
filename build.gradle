@@ -5,6 +5,15 @@ apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'cpp'
 
+sourceSets {
+    test {
+        resources {
+            srcDir "src/test"
+            include "**/*.kt", "**/*.java"
+        }
+    }
+}
+
 buildscript {
     ext.kotlin_version = '1.2.30'
 
@@ -29,8 +38,23 @@ dependencies {
 }
 
 model {
+    platforms {
+        windows_i386 {
+            architecture "i386"
+            operatingSystem "windows"
+        }
+        windows_amd64 {
+            architecture "amd64"
+            operatingSystem "windows"
+        }
+    }
+}
+
+model {
     components {
         winsock_jni(NativeLibrarySpec) {
+            targetPlatform 'windows_amd64'
+            targetPlatform 'windows_i386'
             sources {
                 cpp {
                     lib library: 'winsock', linkage: 'api'
@@ -41,13 +65,32 @@ model {
                     }
                 }
             }
+
+            binaries.withType(SharedLibraryBinarySpec) {
+                cppCompiler.define 'WIN32'
+                cppCompiler.define '_WINDOWS'
+                cppCompiler.define '_USRDLL'
+                cppCompiler.define '_WINDLL'
+                cppCompiler.define '_UNICODE'
+                cppCompiler.define 'UNICODE'
+                cppCompiler.define '_EXPORTING'
+
+                cppCompiler.define 'NDEBUG'
+                cppCompiler.args '/Zi', '/nologo', '/W3', '/WX-', '/sdl', '/O2', '/Oi', '/GL', '/Gm-', '/EHsc', '/MD', '/GS', '/Gy', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/TP'
+
+                linker.args '/INCREMENTAL:NO', '/NOLOGO', '/MANIFEST', '/manifest:embed'
+                linker.args '/DEBUG', '/SUBSYSTEM:WINDOWS', '/OPT:REF', '/OPT:ICF', '/TLBID:1'
+                linker.args '/DYNAMICBASE', '/NXCOMPAT', '/DLL', '/LTCG'
+
+                if (targetPlatform == platforms.windows_amd64) {
+                    linker.args '/MACHINE:X64'
+                } else {
+                    linker.args '/MACHINE:X86'
+                }
+            }
         }
     }
-    
-    platforms {
-        x64 { architecture "x86_64" }
-        x86 { architecture "x86" }
-    }
+
     toolChains {
         visualCpp(VisualCpp) {
             // Specify the installDir if Visual Studio cannot be located
@@ -78,7 +121,11 @@ compileTestKotlin {
 
 jar {
     manifest {
-        attributes('Implementation-Title': project.name,
-                'Implementation-Version': project.version)
+        attributes('Implementation-Title': project.name, 'Implementation-Version': project.version)
     }
+}
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", file("build/libs/winsock_jni/shared/windows_amd64")
+    systemProperty "java.library.path", file("build/libs/winsock_jni/shared/windows_i386")
 }

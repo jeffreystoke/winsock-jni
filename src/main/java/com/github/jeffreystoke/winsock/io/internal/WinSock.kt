@@ -5,7 +5,8 @@ typealias Pointer = Long
 object WinSock {
 
     init {
-        System.loadLibrary("winsock-jni")
+//        System.load("C:/Users/Jeffrey/Desktop/workshop/winsock-jni/build/libs/winsock_jni/shared/winsock_jni.dll")
+        System.loadLibrary("winsock_jni")
         _wsaStartup()?.let { err -> throw RuntimeException(err) }
     }
 
