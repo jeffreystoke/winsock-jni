@@ -59,19 +59,12 @@ model {
         }
     }
     platforms {
-        windows_x86 {
-            architecture 'x86'
-            operatingSystem 'windows'
-        }
-        windows_x64 {
-            architecture 'x86_64'
-            operatingSystem 'windows'
-        }
+        x64 { architecture "x86_64" }
+        x86 { architecture "x86" }
     }
     repositories {
         libs(PrebuiltLibraries) {
             winsock {
-                headers.srcDir "contrib/cpprest/include"
                 binaries.withType(SharedLibraryBinary) {
                     root = System.getenv("SystemRoot")
                     sharedLibraryFile = file("${root}/winsock.dll")
