@@ -5,7 +5,7 @@ import com.github.jeffreystoke.winsock.io.internal.WinSock
 
 object WSAUtils {
 
-    fun wsaCleanup() = WinSock._wsaCleanup()
+    fun wsaCleanup() = WinSock._wsa_cleanup()
 
-    fun wsaGetLastError() = WinSock._wsaGetLastError()
+    fun wsaGetLastError() = WinSock._wsa_get_last_error()
 }

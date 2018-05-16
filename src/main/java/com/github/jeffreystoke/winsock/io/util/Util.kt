@@ -7,7 +7,7 @@ fun Pointer.isNull(): Boolean {
     return this < 1
 }
 
-fun Array<NetEvent>.mergedResult(): Long {
+fun Array<NetEvent>.mergedEvent(): Long {
     var event = 0L
     this.forEach { e ->
         event = event.or(e.value)

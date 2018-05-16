@@ -25,7 +25,8 @@ extern "C" {
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1free(JNIEnv *env, jclass clazz, jlong ptr)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1free(
+    JNIEnv *env, jclass clazz, jlong ptr)
 {
     free(reinterpret_cast<void *>(ptr));
 }
@@ -36,7 +37,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1free(JNIEnv *env, jcl
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaStartup(JNIEnv *env, jclass)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1startup(
+    JNIEnv *env, jclass clazz)
 {
     WSADATA wsaData;
     WORD sockVersion = MAKEWORD(2, 2);
@@ -55,7 +57,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaStartup(JNIEnv *en
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCleanup(JNIEnv *env, jclass)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1cleanup(
+    JNIEnv *env, jclass)
 {
     WSACleanup();
 }
@@ -66,7 +69,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCleanup(JNIEnv *en
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaGetLastError(JNIEnv *env, jclass)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1last_1error(
+    JNIEnv *env, jclass)
 {
     return WSAGetLastError();
 }
@@ -77,7 +81,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaGetLastError(JNIEn
  * Signature: (JII[B)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1setsockopt(JNIEnv *env, jclass clazz, jlong socket, jint level, jint optKey, jbyteArray optVal)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1setsockopt(
+    JNIEnv *env, jclass clazz, jlong socket, jint level, jint optKey, jbyteArray optVal)
 {
     int len = env->GetArrayLength(optVal);
     auto *buf = new char[len];
@@ -92,8 +97,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1setsockopt(JNIEnv *en
  * Signature: (JII[B)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getsockopt(JNIEnv *env, jclass clazz, jlong socket, jint level, jint optKey,
-                                                                      jbyteArray retBuf)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getsockopt(
+    JNIEnv *env, jclass clazz, jlong socket, jint level, jint optKey, jbyteArray retBuf)
 {
     int len = env->GetArrayLength(retBuf);
     auto *buf = new char[len];
@@ -109,8 +114,10 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getsockopt(JNIEnv *en
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1ioctlsocket(JNIEnv *env, jclass clazz, jlong socket, jint mode)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1ioctlsocket(
+    JNIEnv *env, jclass clazz, jlong socket, jint mode)
 {
+    // TODO
 }
 
 /*
@@ -119,7 +126,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1ioctlsocket(JNIEnv *e
  * Signature: (III)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1socket(JNIEnv *env, jclass clazz, jint af, jint sockType, jint proto)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1socket(
+    JNIEnv *env, jclass clazz, jint af, jint sockType, jint proto)
 {
     return socket(af, sockType, proto);
 }
@@ -130,7 +138,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1socket(JNIEnv *env, j
  * Signature: (JLjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1bind(JNIEnv *env, jclass clazz, jlong socket, jstring address, jint port)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1bind(
+    JNIEnv *env, jclass clazz, jlong socket, jstring address, jint port)
 {
 
     sockaddr_in sin{};
@@ -148,7 +157,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1bind(JNIEnv *env, jcl
  * Signature: (JI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1listen(JNIEnv *env, jclass clazz, jlong socket, jint backlog)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1listen(
+    JNIEnv *env, jclass clazz, jlong socket, jint backlog)
 {
     return listen((SOCKET)socket, backlog);
 }
@@ -159,7 +169,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1listen(JNIEnv *env, j
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1accept(JNIEnv *env, jclass clazz, jlong socket)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1accept(
+    JNIEnv *env, jclass clazz, jlong socket)
 {
 
     sockaddr_in sin{};
@@ -173,10 +184,11 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1accept(JNIEnv *env, j
  * Signature: (J[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv(JNIEnv *env, jclass clazz, jlong socket, jbyteArray recvBuf, jint flag)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv(
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray recvBuf, jint flag)
 {
     int len = env->GetArrayLength(recvBuf);
-    auto *buf = new char[len];
+    auto buf = new char[len];
     int ret = recv((SOCKET)socket, buf, len, flag);
     env->SetByteArrayRegion(recvBuf, 0, len, reinterpret_cast<jbyte *>(buf));
     return ret;
@@ -188,10 +200,11 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv(JNIEnv *env, jcl
  * Signature: (J[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send(JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jint flag)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send(
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jint flag)
 {
     int len = env->GetArrayLength(sendBuf);
-    auto *buf = new char[len];
+    auto buf = new char[len];
     env->GetByteArrayRegion(sendBuf, 0, len, reinterpret_cast<jbyte *>(buf));
     return send((SOCKET)socket, buf, len, flag);
 }
@@ -202,7 +215,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send(JNIEnv *env, jcl
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1closesocket(JNIEnv *env, jclass clazz, jlong socket)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1closesocket(
+    JNIEnv *env, jclass clazz, jlong socket)
 {
     return closesocket(static_cast<SOCKET>(socket));
 }
@@ -213,7 +227,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1closesocket(JNIEnv *e
  * Signature: (JI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1shutdown(JNIEnv *env, jclass clazz, jlong socket, jint method)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1shutdown(
+    JNIEnv *env, jclass clazz, jlong socket, jint method)
 {
     return shutdown(static_cast<SOCKET>(socket), method);
 }
@@ -224,7 +239,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1shutdown(JNIEnv *env,
  * Signature: (JLjava/lang/String;I)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1connect(JNIEnv *env, jclass clazz, jlong socket, jstring rAddress, jint port)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1connect(
+    JNIEnv *env, jclass clazz, jlong socket, jstring rAddress, jint port)
 {
 
     sockaddr_in sin{};
@@ -242,7 +258,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1connect(JNIEnv *env, 
  * Signature: (J[BI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recvFrom(JNIEnv *env, jclass clazz, jlong socket, jbyteArray buf, jint flag)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv_1from(
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray buf, jint flag)
 {
     return 0;
 }
@@ -253,8 +270,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recvFrom(JNIEnv *env,
  * Signature: (J[BILjava/lang/String;)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1sendTo(JNIEnv *env, jclass clazz, jlong socket, jbyteArray buf, jint flag,
-                                                                  jstring rAddress)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send_1to(
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray buf, jint flag, jstring rAddress)
 {
     return 0;
 }
@@ -265,7 +282,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1sendTo(JNIEnv *env, j
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createFdSet(JNIEnv *env, jclass clazz)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1fd_1set(
+    JNIEnv *env, jclass clazz)
 {
     auto *fdSet = static_cast<fd_set *>(malloc(sizeof(fd_set)));
     FD_ZERO(fdSet);
@@ -278,7 +296,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createFdSet(JNIEnv *e
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1addFd(JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1add_1fd(
+    JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
 {
     FD_SET((SOCKET)socket, (fd_set *)fdset);
 }
@@ -289,7 +308,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1addFd(JNIEnv *env, jc
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1removeFd(JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1remove_1fd(
+    JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
 {
     FD_CLR((SOCKET)socket, (fd_set *)fdset);
 }
@@ -300,7 +320,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1removeFd(JNIEnv *env,
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getSetFd(JNIEnv *env, jclass clazz, jlong fdset)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1set_1fd(
+    JNIEnv *env, jclass clazz, jlong fdset)
 {
     auto fdSocket = ((fd_set *)fdset);
 
@@ -321,7 +342,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getSetFd(JNIEnv *env,
  * Signature: (JJJI)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(JNIEnv *env, jclass clazz, jlong readFds, jlong writeFds, jlong exceptionFds, jint waitTimeout)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(
+    JNIEnv *env, jclass clazz, jlong readFds, jlong writeFds, jlong exceptionFds, jint waitTimeout)
 {
     timeval wTime{};
     wTime.tv_sec = waitTimeout / 1000;
@@ -335,7 +357,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(JNIEnv *env, j
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCreateEvent(JNIEnv *env, jclass clazz)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1create_1event(
+    JNIEnv *env, jclass clazz)
 {
     return reinterpret_cast<jlong>(WSACreateEvent());
 }
@@ -346,7 +369,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCreateEvent(JNIEnv
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaResetEvent(JNIEnv *env, jclass clazz, jlong event)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1reset_1event(
+    JNIEnv *env, jclass clazz, jlong event)
 {
     return static_cast<jboolean>(WSAResetEvent((HANDLE)event));
 }
@@ -357,7 +381,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaResetEvent(JNIEnv 
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCloseEvent(JNIEnv *env, jclass clazz, jlong event)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1close_1event(
+    JNIEnv *env, jclass clazz, jlong event)
 {
     return static_cast<jboolean>(WSACloseEvent((HANDLE)event));
 }
@@ -368,12 +393,18 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaCloseEvent(JNIEnv 
  * Signature: (I[Ljava/lang/Long;ZIZ)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaWaitForMultipleEvents(JNIEnv *env, jclass clazz, jint count, jobjectArray eventArray, jboolean wait,
-                                                                                    jint timeout, jboolean alertable)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1wait_1for_1multiple_1events(
+    JNIEnv *env, jclass clazz, jint count, jobjectArray eventArray, jboolean wait, jint timeout, jboolean alertable)
 {
-    // TODO get array elements
-    // return WSAWaitForMultipleEvents(count, , wait, timeout, alertable);
-    return 0;
+    auto len = env->GetArrayLength(eventArray);
+    auto events = new WSAEVENT[len];
+    for (int i = 0; i < len; ++i)
+    {
+        auto element = (jlong)evn->GetObjectArrayElement(eventArray, i);
+        events[i] = (WSAEVENT)element;
+    }
+
+    return WSAWaitForMultipleEvents(count, events, wait, timeout, alertable);
 }
 
 /*
@@ -382,7 +413,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaWaitForMultipleEve
  * Signature: (JJJ)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaEventSelect(JNIEnv *env, jclass clazz, jlong socket, jlong event, jlong netEvent)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1event_1select(
+    JNIEnv *env, jclass clazz, jlong socket, jlong event, jlong netEvent)
 {
     return WSAEventSelect((SOCKET)socket, (WSAEVENT)event, (long)netEvent);
 }
@@ -390,13 +422,35 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaEventSelect(JNIEnv
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsaEnumNetworkEvents
- * Signature: (JJ[B)I
+ * Signature: (JJ[B[B)I
  */
 JNIEXPORT jint JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaEnumNetworkEvents(JNIEnv *env, jclass clazz, jlong socket, jlong event, jbyteArray bufForLong)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1enum_1network_1events(
+    JNIEnv *env, jclass clazz, jlong socket, jlong event, jbyteArray bufForLong, jbyteArray bufForInt)
 {
     WSANETWORKEVENTS e;
-    return WSAEnumNetworkEvents((SOCKET)socket, (WSAEVENT) event, &e);
+    auto ret = WSAEnumNetworkEvents((SOCKET)socket, (WSAEVENT)event, &e);
+
+    auto len = env->GetArrayLength(bufForLong);
+    auto long_buf = new char[len];
+    for (auto i = 0; i < len; i++)
+    {
+        long_buf[i] = ((e.lNetworkEvents >> (8 * i)) & 0XFF);
+    }
+    env->SetByteArrayRegion(bufForLong, 0, len, reinterpret_cast<jbyte *>(long_buf));
+
+    e.iErrorCode auto len = env->GetArrayLength(bufForInt);
+    auto int_buf = new char[len];
+    for (auto i = 0; i < len / 4; i++)
+    {
+        for (auto j = 0; j < 4; ++j)
+        {
+            int_buf[i * 4 + j] = ((e.iErrorCode[i] >> (8 * j)) & 0XFF);
+        }
+    }
+    env->SetByteArrayRegion(bufForInt, 0, len, reinterpret_cast<jbyte *>(int_buf));
+
+    return ret
 }
 
 /*
@@ -405,7 +459,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaEnumNetworkEvents(
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1connect(JNIEnv *env, jclass)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1connect(
+    JNIEnv *env, jclass clazz)
 {
 }
 
@@ -415,7 +470,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1connect(JNIEnv *
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1accept(JNIEnv *env, jclass clazz, jlong)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1accept(
+    JNIEnv *env, jclass clazz, jlong socket)
 {
     return 0l;
 }
@@ -426,7 +482,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1accept(JNIEnv *e
  * Signature: (IIII)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSocket(JNIEnv *env, jclass clazz, jint, jint, jint, jint)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1socket(
+    JNIEnv *env, jclass clazz, jint, jint, jint, jint)
 {
     return 0l;
 }
@@ -437,7 +494,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSocket(JNIEnv *env
  * Signature: (J[[BIIJ)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaRecv(
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
     JNIEnv *env, jclass clazz, jlong, jobjectArray, jint, jint, jlong)
 {
     return;
@@ -449,7 +506,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaRecv(
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaRecvFrom(
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv_1from(
     JNIEnv *env, jclass clazz)
 {
 }
@@ -460,7 +517,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaRecvFrom(
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSend(
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
     JNIEnv *env, jclass clazz)
 {
 }
@@ -471,7 +528,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSend(
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSendTo(JNIEnv *env, jclass)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send_1to(
+    JNIEnv *env, jclass clazz)
 {
 }
 
@@ -481,7 +539,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaSendTo(JNIEnv *env
  * Signature: (JLjava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1CompletionKey(
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1completion_1key(
     JNIEnv *env, jclass clazz, jlong, jstring)
 {
     return 0l;
@@ -493,7 +551,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1CompletionKey
  * Signature: (IIIIJ)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createWSAOverlapped(JNIEnv *env, jclass clazz, jint, jint, jint, jint, jlong)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapped(
+    JNIEnv *env, jclass clazz, jint, jint, jint, jint, jlong)
 {
     return 0l;
 }
@@ -504,7 +563,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createWSAOverlapped(J
  * Signature: (JJZJ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaGetOverlappedResult(JNIEnv *env, jclass clazz, jlong, jlong, jboolean, jlong)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
+    JNIEnv *env, jclass clazz, jlong, jlong, jboolean, jlong)
 {
     return 0;
 }
@@ -515,7 +575,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsaGetOverlappedResul
  * Signature: (JJJI)J
  */
 JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createIOCP(JNIEnv *env, jclass clazz, jlong, jlong, jlong, jint)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1iocp(
+    JNIEnv *env, jclass clazz, jlong, jlong, jlong, jint)
 {
     return 0l;
 }
@@ -526,7 +587,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1createIOCP(JNIEnv *en
  * Signature: (JIJJI)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getQueuedCompletionStatus(JNIEnv *env, jclass clazz, jlong, jint, jlong, jlong, jint)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1queued_1completion_1status(
+    JNIEnv *env, jclass clazz, jlong, jint, jlong, jlong, jint)
 {
     return 0;
 }
@@ -537,7 +599,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getQueuedCompletionSt
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1cancelIO(JNIEnv *env, jclass clazz, jlong)
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1cancel_1io(
+    JNIEnv *env, jclass clazz, jlong)
 {
 }
 
@@ -547,7 +610,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1cancelIO(JNIEnv *env,
  * Signature: (JIJJ)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1postQueuedCompletionStatus(
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1post_1queued_1completion_status(
     JNIEnv *env, jclass clazz, jlong, jint, jlong, jlong)
 {
     return 0;
