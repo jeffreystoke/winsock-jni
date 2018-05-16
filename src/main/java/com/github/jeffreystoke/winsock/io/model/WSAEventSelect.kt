@@ -13,6 +13,6 @@ object WSAEventSelect {
 
     // 返回值需要减去 WSA_WAIT_EVENT_0 才是数组索引
     fun waitForMultipleEvents(events: List<WSAEvent>, waitAll: Boolean, waitTimeout: Int): Int =
-            WinSock._wsa_wait_for_multiple_events(events.size, Array(events.size, { i -> events[i].getPtr() }), waitAll, waitTimeout, false)
+            WinSock._wsa_wait_for_multiple_events(events.size, LongArray(events.size, { i -> events[i].getPtr() }), waitAll, waitTimeout, false)
 
 }

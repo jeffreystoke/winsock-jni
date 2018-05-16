@@ -4,6 +4,7 @@ version '0.0.1-alpha'
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'cpp'
+apply plugin: 'maven-publish'
 
 sourceSets {
     test {
@@ -28,6 +29,13 @@ buildscript {
 }
 
 sourceCompatibility = 1.8
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
 
 repositories {
     mavenCentral()
@@ -62,9 +70,13 @@ model {
             operatingSystem "windows"
         }
     }
-}
 
-model {
+    toolChains {
+        visualCpp(VisualCpp) {
+            // installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
+        }
+    }
+
     components {
         winsock_jni(NativeLibrarySpec) {
             targetPlatform 'windows_amd64'
@@ -105,13 +117,6 @@ model {
         }
     }
 
-    toolChains {
-        visualCpp(VisualCpp) {
-            // Specify the installDir if Visual Studio cannot be located
-            // installDir "C:/Apps/Microsoft Visual Studio 10.0"
-            // installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
-        }
-    }
     repositories {
         libs(PrebuiltLibraries) {
             winsock {
@@ -124,18 +129,35 @@ model {
             }
         }
     }
-}
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
 }
 
 jar {
     manifest {
         attributes('Implementation-Title': project.name, 'Implementation-Version': project.version)
+    }
+
+    from('src/main/java') {
+        include '**/*.kt', '**/*.java'
+    }
+
+    from('build/libs/winsock_jni/shared') {
+        include '**/*.dll'
+        into('/natives')
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId project.group
+            artifactId 'winsock-jni'
+            version project.version
+
+            pom.withXml {
+                asNode().appendNode('description', 'JNI wrapper for WinSock API')
+            }
+        }
     }
 }
 

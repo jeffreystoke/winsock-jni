@@ -12,29 +12,31 @@ Give a try for using Java to do something windows native, and learn windows IO m
 
 ## Features
 
-- Windows native socket (done)
-- Select IO Model (done)
-- WSAEventSelect Model (done)
-- Overlapped IO Model (in progress)
-- Completion Port (in progress)
+- Windows native socket
+- Select IO Model
+- WSAEventSelect Model
+- Overlapped IO Model
+- Completion Port
 
 Note: WSAAsyncSelect is NOT supported, cause it requires WinMain as its entrance
 
 ## Usage
 
-// TODO
+Use as other JAR
 
 ## Build
 
-0. Get Visual Studio installed
+0. Get Visual Studio and Java 8 installed, configure `JAVA_HOME` environment variable
 1. Modify `build.gradle`, change `libs->winsock->headers.srcDir` and other path to match your own system
-2. run  `./gradlew assemble` within command line interface
+2. run `./gradlew assemble` in project root
+3. run `./gradlew jar`
 
-Gradle will download essential packages and build, output dir is `build/libs`
+Gradle will download essential packages and build, output is `build/libs/winsock-jni-{VERSION}.jar`
 
 ## Note
 
-For Windows Platform only
+- support Windows Platform only
+- support VisualCpp toolchain only
 
 ## LICENSE
 

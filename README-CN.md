@@ -12,29 +12,31 @@ WinSock API 的 Java 封装 (使用 JNI)
 
 ## 特性
 
-- Windows 原生 Socket (已完成)
-- Select模型 (已完成)
-- WSAEventSelect 模型 (已完成)
-- 重叠 IO 模型 (编写中)
-- IOCP 模型 (编写中)
+- Windows 原生 Socket
+- Select模型
+- WSAEventSelect 模型
+- 重叠 IO 模型
+- IOCP 模型
 
 注: WSAAsyncSelect 由于需要 WinMain 入口无法支持
 
 ## 用法
 
-// TODO
+与其他 JAR 相同
 
 ## Build
 
-0. 安装好 Visual Studio
+0. 安装好 Visual Studio 和 Java 8, 并配置好 `JAVA_HOME` 环境变量
 1. 修改 `build.gradle`, 将 `libs->winsock->headers.srcDir` 及其他路径相关参数与本机匹配
-2. 在项目根目录使用命令行执行 `./gradlew assemble`
+2. 在项目根目录执行 `./gradlew assemble`
+3. 随后执行 `./gradlew jar`
 
-Gradle 将会下载必要的依赖并开始构建, 结果将输出到 `build/libs` 文件夹下
+Gradle 将会下载必要的依赖并开始构建, 输出结果 `build/libs/winsock-jni-{VERSION}.jar`
 
 ## 注意
 
-仅支持 Windows 平台
+- 仅支持 Windows 平台
+- 仅支持 VisualCpp 编译工具链
 
 ## 开源许可
 

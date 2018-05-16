@@ -5,10 +5,14 @@ import com.github.jeffreystoke.winsock.io.internal.Pointer
 import com.github.jeffreystoke.winsock.io.internal.WinSock
 import com.github.jeffreystoke.winsock.io.util.isNull
 import java.io.IOException
+import java.nio.ByteBuffer
 
-class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
-             type: SocketType = SocketType.Stream,
-             protocol: ProtocolType = ProtocolType.TCP) : Struct() {
+open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
+                  type: SocketType = SocketType.Stream,
+                  protocol: ProtocolType = ProtocolType.TCP) : Struct() {
+
+    var address: String = ""
+    var port: Int = 0
 
     internal constructor(socket: Pointer) : this() {
         _ptr = socket
@@ -22,7 +26,7 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     fun setNonBlock(enable: Boolean) {
-//        WinSock._ioctlsocket(_ptr)
+        WinSock._ioctlsocket(_ptr, enable)
     }
 
     fun bind(address: String, port: Int) {
@@ -33,14 +37,26 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
         WinSock._listen(_ptr, backlog)
     }
 
+    @Throws(IOException::class)
     fun accept(): Socket {
-        return Socket(WinSock._accept(_ptr))
+        val addressBuf = ByteArray(256)
+        val portBuf = ByteArray(2)
+        val socket = WinSock._accept(_ptr, addressBuf, portBuf)
+        if (socket == SocketError.INVALID_SOCKET.value) {
+            throw IOException("调用 Accept 失败")
+        }
+
+        return Socket(socket).let { s ->
+            s.address = String(addressBuf)
+            s.port = ByteBuffer.wrap(portBuf).short.toInt()
+            s
+        }
     }
 
     @Throws(IOException::class)
     fun connect(address: String, port: Int) {
         val ret = WinSock._connect(_ptr, address, port)
-        if (ret == SocketError.Error.value) {
+        if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 connect 失败")
         }
     }
@@ -48,7 +64,7 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     @Throws(IOException::class)
     fun recv(buf: ByteArray, flag: Int = 0): Int {
         val ret = WinSock._recv(_ptr, buf, flag)
-        if (ret == SocketError.Error.value) {
+        if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 recv 失败")
         }
 
@@ -56,10 +72,34 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
-    fun send(buf: ByteArray, flag: Int = 0): Int {
-        val ret = WinSock._send(_ptr, buf, flag)
-        if (ret == SocketError.Error.value) {
+    fun recvFrom(flag: Int = 0): UDPPacket {
+        val udpBuf = ByteArray(10)
+        val addressBuf = ByteArray(65536)
+        val portBuf = ByteArray(2)
+        val ret = WinSock._recv_from(_ptr, udpBuf, flag, addressBuf, portBuf)
+
+        if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 send 失败")
+        }
+
+        return UDPPacket(String(addressBuf), ByteBuffer.wrap(portBuf).short.toInt(), udpBuf.copyOf(ret))
+    }
+
+    @Throws(IOException::class)
+    fun send(data: ByteArray, flag: Int = 0): Int {
+        val ret = WinSock._send(_ptr, data, flag)
+        if (ret == SocketError.Error.value.toInt()) {
+            throw IOException("调用 send 失败")
+        }
+
+        return ret
+    }
+
+    @Throws(IOException::class)
+    fun sendTo(udpPacket: UDPPacket, flag: Int = 0): Int {
+        val ret = WinSock._send_to(_ptr, udpPacket.data, flag, udpPacket.address, udpPacket.port)
+        if (ret == SocketError.Error.value.toInt()) {
+            throw IOException("调用 sendTo 失败")
         }
 
         return ret
@@ -80,7 +120,7 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     fun getOption(optionName: SocketOption): ByteArray {
         val buf = ByteArray(256)
         val ret = WinSock._getsockopt(_ptr, 0xffff, optionName.value, buf)
-        if (ret == SocketError.Error.value) {
+        if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 getsockopt 失败")
         }
         return buf
@@ -89,7 +129,7 @@ class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     @Throws(IOException::class)
     fun setOption(optionName: SocketOption, optionValue: ByteArray) {
         val ret = WinSock._setsockopt(_ptr, 0xffff, optionName.value, optionValue)
-        if (ret == SocketError.Error.value) {
+        if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 setsockopt 失败")
         }
     }

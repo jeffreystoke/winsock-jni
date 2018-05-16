@@ -45,10 +45,7 @@ class Select(private val readFdSet: FdSet = FdSet(),
     }
 
     fun select(timeout: Int): Int {
-        return WinSock._select(readFDs = readFdSet.getPtr(),
-                writeFDs = writeFdSet.getPtr(),
-                exceptionFDs = exceptionFdSet.getPtr(),
-                timeout = timeout)
+        return WinSock._select(readFdSet.getPtr(), writeFdSet.getPtr(), exceptionFdSet.getPtr(), timeout)
     }
 
     fun destroy() {

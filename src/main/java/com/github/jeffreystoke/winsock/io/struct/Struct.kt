@@ -7,11 +7,11 @@ import com.github.jeffreystoke.winsock.io.util.isNull
 abstract class Struct {
     protected var _ptr: Pointer = 0
 
-    fun getPtr(): Pointer {
+    open fun getPtr(): Pointer {
         return _ptr
     }
 
-    fun destroy() {
+    open fun destroy() {
         if (_ptr.isNull()) {
             return
         }
