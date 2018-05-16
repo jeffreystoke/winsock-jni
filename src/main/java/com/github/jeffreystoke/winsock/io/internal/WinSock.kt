@@ -5,7 +5,6 @@ typealias Pointer = Long
 object WinSock {
 
     init {
-//        System.load("C:/Users/Jeffrey/Desktop/workshop/winsock-jni/build/libs/winsock_jni/shared/winsock_jni.dll")
         System.loadLibrary("winsock_jni")
         _wsaStartup()?.let { err -> throw RuntimeException(err) }
     }
@@ -81,17 +80,6 @@ object WinSock {
 
     @JvmStatic
     external fun _select(readFDs: Pointer, writeFDs: Pointer, exceptionFDs: Pointer, timeout: Int): Int
-
-    // 消息通知
-
-    external fun _createWindow(): Pointer
-
-    @JvmStatic
-    external fun _wsaAsyncSelect(socket: Pointer, windowPointer: Pointer, msgNum: Int, netEvent: Long): Int
-
-    external fun _wsaGetSelectError(lParam: Pointer): Long
-
-    external fun _wsaGetSelectEvent(lParam: Pointer): Long
 
     // 事件通知
     @JvmStatic
