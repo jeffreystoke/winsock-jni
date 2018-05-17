@@ -27,11 +27,14 @@ Use as other JAR
 ## Build
 
 0. Get Visual Studio and Java 8 installed, configure `JAVA_HOME` environment variable
-1. Modify `build.gradle`, change `libs->winsock->headers.srcDir` and other path to match your own system
-2. run `./gradlew assemble` in project root
-3. run `./gradlew jar`
+1. Modify `native/build.gradle`, change `libs->winsock->headers.srcDir` and other path variables to match your own case
+2. run `cd library && ../gradlew fatJar`
 
-Gradle will download essential packages and build, output is `build/libs/winsock-jni-{VERSION}.jar`
+Gradle will download essential packages and build, output is `library/build/libs/winsock-jni-{VERSION}.jar`
+
+## Examples
+
+// TODO
 
 ## Note
 
