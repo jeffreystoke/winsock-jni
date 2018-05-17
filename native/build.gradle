@@ -73,3 +73,7 @@ model {
         }
     }
 }
+
+jar.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('winsock_jni') }
+}

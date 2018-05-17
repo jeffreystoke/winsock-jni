@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
+def nativeProject = rootProject.file('native')
+
 test {
     useJUnitPlatform()
 
@@ -27,12 +29,12 @@ group = 'com.github.jeffreystoke.winsock'
 task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
-    from('src/main/java') {
+    from(file('src')) {
         include '**/*.kt', '**/*.java'
         into('/src')
     }
 
-    from(file('native/build/libs/winsock_jni/shared')) {
+    from("${nativeProject}/build/libs/winsock_jni/shared") {
         include '**/*.dll'
         into('/natives')
     }
@@ -40,7 +42,7 @@ task fatJar(type: Jar) {
 }
 
 tasks.withType(Test) {
-    def LIB_PATH = 'build/libs/winsock_jni/shared'
-    systemProperty "java.library.path", file("native/${LIB_PATH}/windows_amd64")
-    systemProperty "java.library.path", file("native/${LIB_PATH}/windows_i386")
+    def LIB_PATH = "${nativeProject}/build/libs/winsock_jni/shared"
+    systemProperty "java.library.path", "${LIB_PATH}/windows_amd64"
+    systemProperty "java.library.path", "${LIB_PATH}/windows_i386"
 }
