@@ -6,9 +6,9 @@ import com.github.jeffreystoke.winsock.io.struct.Socket
 import com.github.jeffreystoke.winsock.io.struct.WSAEvent
 import com.github.jeffreystoke.winsock.io.util.mergedEvent
 
-object WSAEventSelect {
+class WSAEventSelect {
 
-    fun start(socket: Socket, event: WSAEvent, caredNetEvents: Array<NetEvent>): Int =
+    fun select(socket: Socket, event: WSAEvent, caredNetEvents: Array<NetEvent>): Int =
             WinSock._wsa_event_select(socket.getPtr(), event.getPtr(), caredNetEvents.mergedEvent())
 
     // 返回值需要减去 WSA_WAIT_EVENT_0 才是数组索引

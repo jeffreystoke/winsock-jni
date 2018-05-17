@@ -1,5 +1,6 @@
 package com.github.jeffreystoke.winsock.io.constant
 
+// 地址类型 AF_XXX
 enum class AddressFamily(val value: Int) {
     UNIX(1),
     Internet(2),

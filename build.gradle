@@ -43,8 +43,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
 }
 
 test {
@@ -136,15 +136,22 @@ jar {
     manifest {
         attributes('Implementation-Title': project.name, 'Implementation-Version': project.version)
     }
+}
+
+task fatJar(type: Jar) {
+    // bundle all dependencies
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     from('src/main/java') {
         include '**/*.kt', '**/*.java'
+        into('/src')
     }
 
     from('build/libs/winsock_jni/shared') {
         include '**/*.dll'
         into('/natives')
     }
+    with jar
 }
 
 publishing {

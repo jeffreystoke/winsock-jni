@@ -12,6 +12,15 @@ class WSABuffer(val size: Int = 256) : Struct() {
         }
     }
 
+    fun get() : ByteArray {
+        // TODO impl native get
+        return ByteArray(0)
+    }
+
+    fun getString() : String {
+        return String(get())
+    }
+
     override fun destroy() {
         if (_ptr.isNull()) {
             return

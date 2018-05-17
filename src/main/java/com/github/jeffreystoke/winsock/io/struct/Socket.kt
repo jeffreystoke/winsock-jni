@@ -62,13 +62,13 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
-    fun recv(buf: ByteArray, flag: Int = 0): Int {
+    fun recv(buf: ByteArray, flag: Int = 0): ByteArray {
         val ret = WinSock._recv(_ptr, buf, flag)
         if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 recv 失败")
         }
 
-        return ret
+        return buf.copyOf(ret)
     }
 
     @Throws(IOException::class)

@@ -20,11 +20,11 @@ WinSock API 的 Java 封装 (使用 JNI)
 
 注: WSAAsyncSelect 由于需要 WinMain 入口无法支持
 
-## 用法
+## 使用
 
-与其他 JAR 相同
+1. 导入 Jar
 
-## Build
+## 构建
 
 0. 安装好 Visual Studio 和 Java 8, 并配置好 `JAVA_HOME` 环境变量
 1. 修改 `build.gradle`, 将 `libs->winsock->headers.srcDir` 及其他路径相关参数与本机匹配

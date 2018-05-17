@@ -1,6 +1,5 @@
 package com.github.jeffreystoke.winsock.io.model
 
-import com.github.jeffreystoke.winsock.io.internal.WinSock
 import com.github.jeffreystoke.winsock.io.struct.CompletionKey
 import com.github.jeffreystoke.winsock.io.struct.Socket
 import com.github.jeffreystoke.winsock.io.struct.Struct
