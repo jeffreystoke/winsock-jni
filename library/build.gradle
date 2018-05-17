@@ -1,0 +1,46 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    reports {
+        html.enabled = true
+    }
+}
+
+dependencies {
+    compile project(":native")
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${rootProject.versions.kotlin}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${rootProject.versions.junit}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${rootProject.versions.junit}"
+}
+
+archivesBaseName = 'winsock-jni'
+version = '0.0.1'
+group = 'com.github.jeffreystoke.winsock'
+
+task fatJar(type: Jar) {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    from('src/main/java') {
+        include '**/*.kt', '**/*.java'
+        into('/src')
+    }
+
+    from(file('native/build/libs/winsock_jni/shared')) {
+        include '**/*.dll'
+        into('/natives')
+    }
+    with jar
+}
+
+tasks.withType(Test) {
+    def LIB_PATH = 'build/libs/winsock_jni/shared'
+    systemProperty "java.library.path", file("native/${LIB_PATH}/windows_amd64")
+    systemProperty "java.library.path", file("native/${LIB_PATH}/windows_i386")
+}

@@ -1,0 +1,75 @@
+apply plugin: 'java'
+apply plugin: 'cpp'
+
+model {
+    platforms {
+        windows_i386 {
+            architecture "i386"
+            operatingSystem "windows"
+        }
+        windows_amd64 {
+            architecture "amd64"
+            operatingSystem "windows"
+        }
+    }
+
+    toolChains {
+        visualCpp(VisualCpp) {
+            // installDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0"
+        }
+    }
+
+    //noinspection GroovyAssignabilityCheck
+    components {
+        winsock_jni(NativeLibrarySpec) {
+            targetPlatform 'windows_amd64'
+            targetPlatform 'windows_i386'
+            sources {
+                cpp {
+                    lib library: 'winsock', linkage: 'api'
+                    lib library: 'jni', linkage: 'api'
+                    source {
+                        srcDir 'src/main/jni'
+                        include "**/*.cpp"
+                    }
+                }
+            }
+
+            binaries.withType(SharedLibraryBinarySpec) {
+                cppCompiler.define 'WIN32'
+                cppCompiler.define '_WINDOWS'
+                cppCompiler.define '_USRDLL'
+                cppCompiler.define '_WINDLL'
+                cppCompiler.define '_UNICODE'
+                cppCompiler.define 'UNICODE'
+                cppCompiler.define '_EXPORTING'
+
+                cppCompiler.define 'NDEBUG'
+                cppCompiler.args '/Zi', '/nologo', '/W3', '/WX-', '/sdl', '/O2', '/Oi', '/GL', '/Gm-', '/EHsc', '/MD', '/GS', '/Gy', '/fp:precise', '/Zc:wchar_t', '/Zc:forScope', '/Gd', '/TP'
+
+                linker.args '/INCREMENTAL:NO', '/NOLOGO', '/MANIFEST', '/manifest:embed'
+                linker.args '/DEBUG', '/SUBSYSTEM:WINDOWS', '/OPT:REF', '/OPT:ICF', '/TLBID:1'
+                linker.args '/DYNAMICBASE', '/NXCOMPAT', '/DLL', '/LTCG'
+
+                if (targetPlatform == platforms.windows_amd64) {
+                    linker.args '/MACHINE:X64'
+                } else {
+                    linker.args '/MACHINE:X86'
+                }
+            }
+        }
+    }
+
+    repositories {
+        libs(PrebuiltLibraries) {
+            winsock {
+                headers.srcDir "C:/Program Files (x86)/Windows Kits/8.1/Include/um"
+            }
+            jni {
+                def JAVA_HOME = "${System.properties.'java.home'}/.."
+                headers.srcDir "${JAVA_HOME}/include"
+                headers.srcDir "${JAVA_HOME}/include/win32"
+            }
+        }
+    }
+}
