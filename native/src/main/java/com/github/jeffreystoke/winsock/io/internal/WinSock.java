@@ -126,16 +126,10 @@ public class WinSock {
     public static native long _wsa_socket(int addressFamily, int socketType, int proto, int flag);
 
     // WSARecv()
-    public static native int _wsa_recv(long s, long[] buffers, long overlappedStruct);
+    public static native int _wsa_recv(long s, byte[] buffer, long overlappedStruct);
 
     // WSASend()
-    public static native int _wsa_send(long s, long[] buffers, long overlappedStruct);
-
-    public static native long _create_wsa_buf(int size);
-
-    public static native byte[] _get_wsa_buf(long wsaBuf);
-
-    public static native void _destroy_wsa_buf(long wsaBuf);
+    public static native int _wsa_send(long s, byte[] data, long overlappedStruct);
 
     public static native long _create_completion_key(long socket, String remoteAddress, int port);
 

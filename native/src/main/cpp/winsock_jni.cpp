@@ -550,90 +550,44 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1socket(
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_recv
- * Signature: (JJJ)I
+ * Signature: (J[BJ)I
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
-    JNIEnv *env, jclass clazz, jlong socket, jlongArray recvBufs, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray recvBuf, jlong overlapped)
 {
-    int len = env->GetArrayLength(recvBufs);
-    jlong *array = env->GetLongArrayElements(recvBufs, FALSE);
-    WSABUF *buf = new WSABUF[len];
-    for (int i = 0; i < len; ++i)
-    {
-        buf[i] = *((WSABUF *)array[i]);
-    }
-    env->ReleaseLongArrayElements(recvBufs, array, 0);
+    WSABUF *buf = new WSABUF{};
+    buf->len = env->GetArrayLength(recvBuf);
+    buf->buf = new char[buf->len];
     DWORD flag = 0;
-    int ret = WSARecv(static_cast<SOCKET>(socket), buf, len, nullptr, &flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    int ret = WSARecv(static_cast<SOCKET>(socket), buf, 1, nullptr, &flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    env->SetByteArrayRegion(recvBuf, 0, buf->len, reinterpret_cast<jbyte *>(buf->buf));
+
+    delete buf->buf;
     delete buf;
+
     return ret;
 }
 
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_send
- * Signature: (JJJ)I
+ * Signature: (J[BJ)I
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
-    JNIEnv *env, jclass clazz, jlong socket, jlongArray sendBufs, jlong overlapped)
-{
-    int len = env->GetArrayLength(sendBufs);
-    jlong *array = env->GetLongArrayElements(sendBufs, FALSE);
-    WSABUF *buf = new WSABUF[len];
-    for (int i = 0; i < len; ++i)
-    {
-        buf[i] = *((WSABUF *)array[i]);
-    }
-    DWORD flag = 0;
-    env->ReleaseLongArrayElements(sendBufs, array, 0);
-    int ret = WSASend(static_cast<SOCKET>(socket), buf, len, nullptr, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
-    delete buf;
-    return ret;
-}
-
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _create_wsa_buf
- * Signature: (I)J
- */
-JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1buf(
-    JNIEnv *env, jclass clazz, jint size)
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jlong overlapped)
 {
     WSABUF *buf = new WSABUF{};
-    buf->buf = new char[size];
-    buf->len = (u_long)size;
-    return (jlong)buf;
-}
+    buf->len = env->GetArrayLength(sendBuf);
+    buf->buf = new char[buf->len];
+    env->GetByteArrayRegion(sendBuf, 0, buf->len, reinterpret_cast<jbyte *>(buf->buf));
+    DWORD flag = 0;
+    int ret = WSASend(static_cast<SOCKET>(socket), buf, 1, nullptr, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
 
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _destroy_wsa_buf
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1wsa_1buf(
-    JNIEnv *env, jobject obj, jlong buf)
-{
-    WSABUF *wsaBuf = (WSABUF *)buf;
-    delete wsaBuf->buf;
-    delete wsaBuf;
-}
+    delete buf->buf;
+    delete buf;
 
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _get_wsa_buf
- * Signature: (J)[B
- */
-JNIEXPORT jbyteArray JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1wsa_1buf(
-    JNIEnv *env, jobject obj, jlong buf)
-{
-    WSABUF *wsaBuf = (WSABUF *)buf;
-    auto ret = env->NewByteArray(wsaBuf->len);
-    env->SetByteArrayRegion(ret, 0, wsaBuf->len, reinterpret_cast<jbyte *>(wsaBuf->buf));
     return ret;
 }
 
