@@ -25,7 +25,7 @@ dependencies {
 }
 
 archivesBaseName = 'winsock-jni'
-version = '0.0.1'
+version = '0.1'
 group = 'com.github.jeffreystoke.winsock'
 
 task fatJar(type: Jar) {
