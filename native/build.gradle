@@ -29,7 +29,7 @@ model {
                     lib library: 'winsock', linkage: 'api'
                     lib library: 'jni', linkage: 'api'
                     source {
-                        srcDir 'src/main/jni'
+                        srcDir 'src/main/cpp'
                         include "**/*.cpp"
                     }
                 }

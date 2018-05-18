@@ -1,6 +1,6 @@
 # winsock-jni
 
-JNI Wrapper for WinSock API (under heavy development)
+JNI Wrapper for WinSock API
 
 [中文](./README-CN.md)
 
@@ -22,7 +22,17 @@ Note: WSAAsyncSelect is NOT supported, cause it requires WinMain as its entrance
 
 ## Usage
 
-Use as other JAR
+### JAR
+
+Build, then import the generated Jar
+
+### Maven
+
+// TODO
+
+### Gradle
+
+// TODO
 
 ## Build
 

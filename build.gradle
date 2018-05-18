@@ -1,6 +1,6 @@
 buildscript {
     ext.versions = [
-            'kotlin': '1.2.30',
+            'kotlin': '1.2.41',
             'junit' : '5.2.0'
     ]
 

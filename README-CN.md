@@ -22,13 +22,23 @@ WinSock API 的 Java 封装 (使用 JNI)
 
 ## 使用
 
-1. 导入 Jar
+## JAR
+
+自行构建, 导入生成的 Jar 即可
+
+## Maven
+
+// TODO
+
+## Gradle
+
+// TODO
 
 ## 构建
 
 0. 安装好 Visual Studio 和 Java 8, 并配置好 `JAVA_HOME` 环境变量
 1. 修改 `native/build.gradle`, 将 `libs->winsock->headers.srcDir` 及其他路径相关参数与本机匹配
-2. 执行 `cd library && ../gradlew assemble`
+2. 执行 `cd library && ../gradlew fatJar`
 
 Gradle 将会下载必要的依赖并开始构建, 输出结果 `build/libs/winsock-jni-{VERSION}.jar`
 
