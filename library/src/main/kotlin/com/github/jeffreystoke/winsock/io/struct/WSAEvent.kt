@@ -6,7 +6,8 @@ import com.github.jeffreystoke.winsock.io.util.isNull
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class WSAEvent : Struct() {
+
+class WSAEvent(val socket: Socket) : Struct() {
 
     init {
         _ptr = WinSock._wsa_create_event()
@@ -15,18 +16,27 @@ class WSAEvent : Struct() {
         }
     }
 
+    /**
+     * 将状态设置为未传信
+     */
     @Throws(IOException::class)
     fun reset() {
         if (!WinSock._wsa_reset_event(_ptr)) throw IOException("执行 WSARestEvent 失败")
     }
 
+    /**
+     * 关闭事件，不再有效
+     */
     @Throws(IOException::class)
     fun close() {
         if (!WinSock._wsa_close_event(_ptr)) throw IOException("执行 WSACloseEvent 失败")
     }
 
+    /**
+     * 获取发生的网络事件
+     */
     @Throws(IOException::class)
-    fun getNetEvent(socket: Socket): NetEvent {
+    fun getNetEvent(): NetEvent {
         val bufForLong = ByteArray(8)
         val bufForInt = ByteArray(40)
         val ret = WinSock._wsa_enum_network_events(socket.getPtr(), _ptr, bufForLong, bufForInt)

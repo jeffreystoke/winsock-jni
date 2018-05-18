@@ -33,6 +33,18 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1free(
 
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
+ * Method:    _get_wsa_wait_event_0
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1wsa_1wait_1event_10(
+    JNIEnv *env, jclass clazz)
+{
+    return WSA_WAIT_EVENT_0;
+}
+
+/*
+ * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_startup
  * Signature: ()Ljava/lang/String;
  */
@@ -468,6 +480,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1wait_1for_1multi
     {
         events[i] = (WSAEVENT)array[i];
     }
+    env->ReleaseLongArrayElements(eventArray, array, 0);
     int ret = WSAWaitForMultipleEvents(count, events, wait, timeout, alertable);
     delete events;
 
@@ -537,11 +550,11 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1socket(
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_recv
- * Signature: (J[Ljava/lang/Long;IIJ)I
+ * Signature: (JJJ)I
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
-    JNIEnv *env, jclass clazz, jlong socket, jlongArray recvBufs, jint count, jint flag, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jlongArray recvBufs, jlong overlapped)
 {
     int len = env->GetArrayLength(recvBufs);
     jlong *array = env->GetLongArrayElements(recvBufs, FALSE);
@@ -550,7 +563,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
     {
         buf[i] = *((WSABUF *)array[i]);
     }
-    int ret = WSARecv(static_cast<SOCKET>(socket), buf, len, (LPDWORD)count, (LPDWORD)flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    env->ReleaseLongArrayElements(recvBufs, array, 0);
+    DWORD flag = 0;
+    int ret = WSARecv(static_cast<SOCKET>(socket), buf, len, nullptr, &flag, (LPWSAOVERLAPPED)overlapped, nullptr);
     delete buf;
     return ret;
 }
@@ -558,11 +573,11 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_send
- * Signature: (J[Ljava/lang/Long;IIJ)I
+ * Signature: (JJJ)I
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
-    JNIEnv *env, jclass clazz, jlong socket, jlongArray sendBufs, jint count, jint flag, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jlongArray sendBufs, jlong overlapped)
 {
     int len = env->GetArrayLength(sendBufs);
     jlong *array = env->GetLongArrayElements(sendBufs, FALSE);
@@ -571,7 +586,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
     {
         buf[i] = *((WSABUF *)array[i]);
     }
-    int ret = WSASend(static_cast<SOCKET>(socket), buf, len, (LPDWORD)count, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    DWORD flag = 0;
+    env->ReleaseLongArrayElements(sendBufs, array, 0);
+    int ret = WSASend(static_cast<SOCKET>(socket), buf, len, nullptr, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
     delete buf;
     return ret;
 }
@@ -608,7 +625,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1wsa_1buf(
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _get_wsa_buf
- * Signature: (J)V
+ * Signature: (J)[B
  */
 JNIEXPORT jbyteArray JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1wsa_1buf(
@@ -620,11 +637,11 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1wsa_1buf(
     return ret;
 }
 
-typedef struct _completionKey
+typedef struct _completion_key
 {
     SOCKET s;
     SOCKADDR_IN *remote_addr;
-} COMPLETION_KEY;
+} completion_key_s;
 
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
@@ -635,7 +652,7 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1completion_1key(
     JNIEnv *env, jclass clazz, jlong socket, jstring address, jint port)
 {
-    COMPLETION_KEY *key = new COMPLETION_KEY{};
+    completion_key_s *key = new completion_key_s{};
     key->s = static_cast<SOCKET>(socket);
     sockaddr_in *sin = new sockaddr_in{};
     sin->sin_family = AF_INET;
@@ -643,8 +660,22 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1completion_1k
     auto addr = env->GetStringUTFChars(address, nullptr);
     sin->sin_addr.s_addr = inet_addr(addr);
     env->ReleaseStringUTFChars(address, addr);
-    key->remote_addr = (SOCKADDR_IN *) sin;
+    key->remote_addr = (SOCKADDR_IN *)sin;
     return (jlong)key;
+}
+
+/*
+ * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
+ * Method:    _destroy_completion_key
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1completion_1key(
+    JNIEnv *env, jclass clazz, jlong ptr)
+{
+    completion_key_s *key = (completion_key_s *)ptr;
+    delete key->remote_addr;
+    delete key;
 }
 
 /*
@@ -669,11 +700,16 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapp
  * Method:    _wsa_get_overlapped_result
  * Signature: (JJIZJ)Z
  */
-JNIEXPORT jboolean JNICALL
+JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
-    JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jint count, jboolean wait, jlong flag)
+    JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jboolean wait, jlong flag)
 {
-    return WSAGetOverlappedResult(static_cast<SOCKET>(socket), (LPWSAOVERLAPPED)overlapped, reinterpret_cast<LPDWORD>(count), wait, reinterpret_cast<PDWORD>(flag));
+    DWORD count = 0;
+    if (WSAGetOverlappedResult(static_cast<SOCKET>(socket), (LPWSAOVERLAPPED)overlapped, &count, wait, reinterpret_cast<PDWORD>(flag)))
+    {
+        return count;
+    }
+    return -1;
 }
 
 /*
@@ -688,16 +724,128 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1iocp(
     return (jlong)CreateIoCompletionPort((HANDLE)(ULONG_PTR)socket, (HANDLE)otherCP, (ULONG_PTR)completionKey, threadCount);
 }
 
+typedef enum _io_op_type {
+    IO_OP_READ = 0,
+    IO_OP_WRITE = 1,
+    IO_OP_CLOSE = 2,
+    IO_OP_ERROR = 3,
+} io_op_type_e;
+
+#define BUFFER_SIZE 1024
+#define TIMEOUT_VAL 100
+
+typedef struct _io_op_info
+{
+    OVERLAPPED overlapped;
+    WSABUF buf;
+    CHAR buffer[BUFFER_SIZE];
+    io_op_type_e opType;
+    INT len;
+} io_op_info_s;
+
+static JavaVM *jvm;
+static jclass mCompletionPortModelClass;
+static jmethodID mOnMessageMethod;
+
+/*
+ * 服务线程 
+ */
+DWORD WINAPI ServerWorkerThread(LPVOID cp)
+{
+    DWORD count = 0;
+    LPOVERLAPPED lpOverlapped;
+    completion_key_s *completion_key;
+    while (TRUE)
+    {
+        count = 0;
+        lpOverlapped = nullptr;
+        if (GetQueuedCompletionStatus((HANDLE)cp, &count,
+                                      (PULONG_PTR)&completion_key,
+                                      &lpOverlapped, TIMEOUT_VAL))
+        {
+            // success
+            if (count == 0)
+            {
+                // connection closed
+            }
+            io_op_info_s *op_info = CONTAINING_RECORD(lpOverlapped, io_op_info_s, overlapped);
+
+            JNIEnv *g_env;
+            jvm->AttachCurrentThread((void **)&g_env, NULL);
+            if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
+            {
+                continue;
+            }
+            else
+            {
+                int len = op_info->len;
+                op_info->len = 0;
+                jbyteArray ret = g_env->NewByteArray(len);
+                g_env->SetByteArrayRegion(ret, 0, len, reinterpret_cast<jbyte *>(op_info->buffer));
+                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
+                                            mOnMessageMethod, (jlong)cp,
+                                            (jlong)completion_key,
+                                            (jint)op_info->opType, ret);
+            }
+        }
+        else
+        {
+            // failed
+            DWORD err = GetLastError();
+            if (err == WAIT_TIMEOUT)
+            {
+                // timeout, that's ok
+                continue;
+            }
+            else if (lpOverlapped != nullptr)
+            {
+                // io error, oops
+                JNIEnv *g_env;
+                jvm->AttachCurrentThread((void **)&g_env, NULL);
+                if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
+                {
+                    continue;
+                }
+                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
+                                            mOnMessageMethod, (jlong)cp,
+                                            (jlong)completion_key,
+                                            (jint)IO_OP_ERROR, nullptr);
+            }
+            else
+            {
+                // other error, ooooooops
+                break;
+            }
+        }
+    }
+    return 0;
+}
+
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _get_queued_completion_status
- * Signature: (JIJJI)Z
+ * Method:    _create_server_thread
+ * Signature: (I)I
  */
-JNIEXPORT jboolean JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1queued_1completion_1status(
-    JNIEnv *, jclass, jlong cp, jint count, jlong completionKey, jlong overlapped, jint waitTimeout)
+JNIEXPORT jint JNICALL
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1server_1thread(
+    JNIEnv *env, jclass clazz, jlong cp)
 {
-    return GetQueuedCompletionStatus((HANDLE)cp, reinterpret_cast<LPDWORD>(count), reinterpret_cast<PULONG_PTR>(completionKey), (LPOVERLAPPED *)overlapped, waitTimeout);
+    env->GetJavaVM(&jvm);
+    mCompletionPortModelClass = (jclass)env->NewGlobalRef(
+        env->FindClass("com/github/jeffreystoke/winsock/io/model/CompletionPortModel"));
+    mOnMessageMethod = env->GetStaticMethodID(mCompletionPortModelClass, "onMessage", "(LLI[B)V");
+
+    HANDLE thread;
+    DWORD thread_id;
+    if ((thread = CreateThread(nullptr, 0,
+                               ServerWorkerThread,
+                               (LPVOID)cp,
+                               0, &thread_id)) == nullptr)
+    {
+        return GetLastError();
+    }
+    CloseHandle(thread);
+    return 0;
 }
 
 /*

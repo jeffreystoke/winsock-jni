@@ -1,6 +1,7 @@
 package com.github.jeffreystoke.winsock.io.util
 
 import com.github.jeffreystoke.winsock.io.constant.NetEvent
+import com.github.jeffreystoke.winsock.io.internal.WinSock
 
 typealias Pointer = Long
 
@@ -15,3 +16,7 @@ fun Array<NetEvent>.mergedEvent(): Long {
     }
     return event
 }
+
+fun wsaCleanup() = WinSock._wsa_cleanup()
+
+fun wsaGetLastError() = WinSock._wsa_get_last_error()

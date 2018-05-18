@@ -7,7 +7,7 @@ class WSAOverlapped(internal: Int,
                     internalHigh: Int,
                     offset: Int,
                     offsetHigh: Int,
-                    wsaEvent: WSAEvent) : Struct() {
+                    val wsaEvent: WSAEvent) : Struct() {
 
     init {
         _ptr = WinSock._create_wsa_overlapped(internal, internalHigh, offset, offsetHigh, wsaEvent.getPtr())

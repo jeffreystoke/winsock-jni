@@ -15,7 +15,7 @@ public class SelectServer extends Thread {
         SelectModel select = new SelectModel();
 
         select.addReadFd(mServerSocket);
-        int i = select.select(0);
+        int i = select.run(0);
         if (!interrupted()) {
             Socket client = select.getReadSetSocket();
             if (client != null) {

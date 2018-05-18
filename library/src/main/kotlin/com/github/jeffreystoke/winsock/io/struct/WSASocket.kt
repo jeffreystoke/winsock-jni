@@ -21,12 +21,12 @@ class WSASocket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
-    fun wsaRecv(buf: Array<WSABuffer>, toRead: Int, flag: Int, overlapped: WSAOverlapped): Int {
-        return WinSock._wsa_recv(_ptr, LongArray(buf.size, { i -> buf[i].getPtr() }), toRead, flag, overlapped.getPtr())
+    fun wsaRecv(buf: Array<WSABuffer>, overlapped: WSAOverlapped): Int {
+        return WinSock._wsa_recv(_ptr, LongArray(buf.size, { i -> buf[i].getPtr() }), overlapped.getPtr())
     }
 
     @Throws(IOException::class)
-    fun wsaSend(data: Array<WSABuffer>, toSend: Int, flag: Int, overlapped: WSAOverlapped): Int {
-        return WinSock._wsa_send(_ptr, LongArray(data.size, { i -> data[i].getPtr() }), toSend, flag, overlapped.getPtr())
+    fun wsaSend(data: Array<WSABuffer>, overlapped: WSAOverlapped): Int {
+        return WinSock._wsa_send(_ptr, LongArray(data.size, { i -> data[i].getPtr() }), overlapped.getPtr())
     }
 }
