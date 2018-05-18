@@ -16,6 +16,8 @@
 
 package com.github.jeffreystoke.winsock.examples.simple;
 
+import com.github.jeffreystoke.winsock.io.util.UtilKt;
+
 public class SimpleTest {
 
     public static void main(String[] args) throws InterruptedException {

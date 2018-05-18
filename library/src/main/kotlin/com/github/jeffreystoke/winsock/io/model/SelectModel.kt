@@ -38,7 +38,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun addReadFd(s: Socket) {
+    fun addReadSocket(s: Socket) {
         readFdSet.add(s)
     }
 
@@ -47,7 +47,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun addWriteFd(s: Socket) {
+    fun addWriteSocket(s: Socket) {
         writeFdSet.add(s)
     }
 
@@ -56,7 +56,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun addExceptionFd(s: Socket) {
+    fun addExceptionSocket(s: Socket) {
         exceptionFdSet.add(s)
     }
 
@@ -65,7 +65,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun removeReadFd(s: Socket) {
+    fun removeReadSocket(s: Socket) {
         readFdSet.remove(s)
     }
 
@@ -74,7 +74,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun removeWriteFd(s: Socket) {
+    fun removeWriteSocket(s: Socket) {
         writeFdSet.remove(s)
     }
 
@@ -83,7 +83,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      *
      * @param s Socket
      */
-    fun removeExceptionFd(s: Socket) {
+    fun removeExceptionSocket(s: Socket) {
         exceptionFdSet.remove(s)
     }
 

@@ -12,9 +12,4 @@ public abstract class Server extends Thread {
         System.out.println("[" + getTag() + "] " + String.join(" ", s));
     }
 
-    @Override
-    public void run() {
-        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
-        mServerSocket.listen();
-    }
 }

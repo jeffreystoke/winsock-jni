@@ -32,17 +32,18 @@ public class SelectServer extends Server {
 
     @Override
     public void run() {
-        super.run();
+        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
+        mServerSocket.listen();
 
-        SelectModel select = new SelectModel();
-        select.addReadFd(mServerSocket);
+        SelectModel sm = new SelectModel();
+        sm.addReadSocket(mServerSocket);
         while (true) {
-            if (select.run(1000) < 1) {
+            if (sm.run(0) < 1) {
                 println("select failed");
                 break;
             }
 
-            Socket s = select.getReadSetSocket();
+            Socket s = sm.getReadSetSocket();
             if (s == null) {
                 continue;
             }
@@ -52,7 +53,7 @@ public class SelectServer extends Server {
                     println("accept");
                     Socket client = mServerSocket.accept();
                     println("client connected");
-                    select.addReadFd(client);
+                    sm.addReadSocket(client);
                     println("client added to read fd set");
                     client.send(Constants.sMessage.getBytes());
                     println("sent message");

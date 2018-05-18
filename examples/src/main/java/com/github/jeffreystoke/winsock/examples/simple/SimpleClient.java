@@ -17,6 +17,7 @@
 package com.github.jeffreystoke.winsock.examples.simple;
 
 import com.github.jeffreystoke.winsock.examples.Constants;
+import com.github.jeffreystoke.winsock.io.internal.WinSock;
 import com.github.jeffreystoke.winsock.io.struct.Socket;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class SimpleClient extends Thread {
         try {
             mSocket.connect(Constants.sListenAddress, Constants.sListenPort);
             mSocket.send(Constants.sMessage.getBytes(), 0);
-            System.out.println("SERVER MESSAGE: " + new String(mSocket.recv()));
+            System.out.println("SERVER MESSAGE: " + new String(mSocket.recv()));            WinSock._wsa_cleanup();
         } catch (IOException e) {
             e.printStackTrace();
         }
