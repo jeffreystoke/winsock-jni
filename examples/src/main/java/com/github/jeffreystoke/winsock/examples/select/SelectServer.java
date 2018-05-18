@@ -17,25 +17,59 @@
 package com.github.jeffreystoke.winsock.examples.select;
 
 import com.github.jeffreystoke.winsock.examples.Constants;
+import com.github.jeffreystoke.winsock.examples.Server;
 import com.github.jeffreystoke.winsock.io.model.SelectModel;
 import com.github.jeffreystoke.winsock.io.struct.Socket;
 
-public class SelectServer extends Thread {
+import java.io.IOException;
 
-    private Socket mServerSocket = new Socket();
+public class SelectServer extends Server {
+
+    @Override
+    protected String getTag() {
+        return SelectServer.class.getSimpleName();
+    }
 
     @Override
     public void run() {
-        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
-        mServerSocket.listen();
-        SelectModel select = new SelectModel();
+        super.run();
 
+        SelectModel select = new SelectModel();
         select.addReadFd(mServerSocket);
-        int i = select.run(0);
-        if (!interrupted()) {
-            Socket client = select.getReadSetSocket();
-            if (client != null) {
-                select.addReadFd(client);
+        while (true) {
+            if (select.run(1000) < 1) {
+                println("select failed");
+                break;
+            }
+
+            Socket s = select.getReadSetSocket();
+            if (s == null) {
+                continue;
+            }
+
+            if (s.equals(mServerSocket)) {
+                try {
+                    println("accept");
+                    Socket client = mServerSocket.accept();
+                    println("client connected");
+                    select.addReadFd(client);
+                    println("client added to read fd set");
+                    client.send(Constants.sMessage.getBytes());
+                    println("sent message");
+                } catch (IOException e) {
+                    println("accept error", e.getMessage());
+                }
+            } else {
+                try {
+                    println("client message", new String(s.recv()));
+                } catch (IOException e) {
+                    println("recv error ", e.getMessage());
+                    try {
+                        s.close();
+                    } catch (IOException e1) {
+                        println("close error ", e1.getMessage());
+                    }
+                }
             }
         }
     }

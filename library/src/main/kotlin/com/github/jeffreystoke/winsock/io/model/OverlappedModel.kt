@@ -32,10 +32,11 @@ class OverlappedModel : Struct() {
      *
      * @return WSAEvent     发生事件的对象
      */
-    fun waitForMultipleEvents(events: Array<WSAEvent>, waitTimeout: Int): WSAEvent {
+    fun waitForMultipleEvents(events: List<WSAEvent>, waitTimeout: Int): WSAEvent {
         val index = WinSock._wsa_wait_for_multiple_events(events.size,
                 LongArray(events.size, { i -> events[i].getPtr() }),
                 false, waitTimeout, false)
+
         return events[index - WinSock.WSA_WAIT_EVENT_0]
     }
 

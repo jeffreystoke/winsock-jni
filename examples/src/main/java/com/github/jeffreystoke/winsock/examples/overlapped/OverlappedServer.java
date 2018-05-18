@@ -16,6 +16,33 @@
 
 package com.github.jeffreystoke.winsock.examples.overlapped;
 
-public class OverlappedServer {
+import com.github.jeffreystoke.winsock.examples.Server;
+import com.github.jeffreystoke.winsock.io.model.OverlappedModel;
+import com.github.jeffreystoke.winsock.io.struct.WSAEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class OverlappedServer extends Server {
+
+    List<WSAEvent> events = new ArrayList<>();
+
+    @Override
+    protected String getTag() {
+        return OverlappedServer.class.getSimpleName();
+    }
+
+    @Override
+    public void run() {
+        super.run();
+        WSAEvent event = new WSAEvent(mServerSocket);
+        events.add(event);
+
+        OverlappedModel om = new OverlappedModel();
+        while (true) {
+            WSAEvent eve = om.waitForMultipleEvents(events, 0);
+            eve = om.waitForMultipleEvents(Collections.singletonList(eve), 0);
+        }
+    }
 }

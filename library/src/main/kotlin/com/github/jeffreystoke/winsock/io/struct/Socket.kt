@@ -58,7 +58,7 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
-    fun accept(): Socket {
+    open fun accept(): Socket {
         val addressBuf = ByteArray(256)
         val portBuf = ByteArray(2)
         val socket = WinSock._accept(_ptr, addressBuf, portBuf)
@@ -161,6 +161,19 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
         val ret = WinSock._setsockopt(_ptr, 0xffff, optionName.value, optionValue)
         if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 setsockopt 失败")
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other != null) {
+            return false
+        }
+
+        return when (other) {
+            is Socket -> {
+                _ptr == other._ptr
+            }
+            else -> false
         }
     }
 }

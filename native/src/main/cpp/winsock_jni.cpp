@@ -651,18 +651,13 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1completion_1
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _create_wsa_overlapped
- * Signature: (IIIIJ)J
+ * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapped(
-    JNIEnv *env, jclass clazz, jint internal, jint internalHigh, jint offset, jint offsetHigh, jlong evnet)
+    JNIEnv *env, jclass clazz, jlong evnet)
 {
-    WSAOVERLAPPED *o = new WSAOVERLAPPED{};
-    o->Internal = internal;
-    o->InternalHigh = internalHigh;
-    o->Offset = offset;
-    o->OffsetHigh = offsetHigh;
-    return (jlong)o;
+    return (jlong) new WSAOVERLAPPED{};
 }
 
 /*

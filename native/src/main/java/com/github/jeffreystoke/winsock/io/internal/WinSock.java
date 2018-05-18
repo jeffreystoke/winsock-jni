@@ -151,7 +151,7 @@ public class WinSock {
 
     public static native void _destroy_completion_key(long keyPtr);
 
-    public static native long _create_wsa_overlapped(int internal, int internalHigh, int offset, int offsetHigh, long wsaEvent);
+    public static native long _create_wsa_overlapped(long wsaEvent);
 
     public static native int _wsa_get_overlapped_result(long s, long wsaOverlapped, boolean wait, long flag);
 

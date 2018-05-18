@@ -16,18 +16,21 @@
 
 package com.github.jeffreystoke.winsock.io.struct
 
-import com.github.jeffreystoke.winsock.io.constant.AddressFamily
-import com.github.jeffreystoke.winsock.io.constant.ProtocolType
-import com.github.jeffreystoke.winsock.io.constant.SocketFlag
-import com.github.jeffreystoke.winsock.io.constant.SocketType
+import com.github.jeffreystoke.winsock.io.constant.*
 import com.github.jeffreystoke.winsock.io.internal.WinSock
+import com.github.jeffreystoke.winsock.io.util.Pointer
 import com.github.jeffreystoke.winsock.io.util.isNull
 import java.io.IOException
+import java.nio.ByteBuffer
 
 class WSASocket(addressFamily: AddressFamily = AddressFamily.Internet,
                 type: SocketType = SocketType.Stream,
                 protocol: ProtocolType = ProtocolType.TCP,
                 flag: SocketFlag = SocketFlag.WSA_FLAG_OVERLAPPED) : Socket() {
+
+    private constructor(ptr: Pointer) : this() {
+        _ptr = ptr
+    }
 
     init {
         _ptr = WinSock._wsa_socket(addressFamily.value, type.value, protocol.value, flag.value)
@@ -37,8 +40,29 @@ class WSASocket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
+    override fun accept(): WSASocket {
+        val addressBuf = ByteArray(256)
+        val portBuf = ByteArray(2)
+        val socket = WinSock._accept(_ptr, addressBuf, portBuf)
+        if (socket == SocketError.INVALID_SOCKET.value) {
+            throw IOException("调用 Accept 失败")
+        }
+
+        return WSASocket(socket).let { s ->
+            s.address = String(addressBuf)
+            s.port = ByteBuffer.wrap(portBuf).short.toInt()
+            s
+        }
+    }
+
+    @Throws(IOException::class)
     fun wsaRecv(buf: ByteArray, overlapped: WSAOverlapped): Int {
         return WinSock._wsa_recv(_ptr, buf, overlapped.getPtr())
+    }
+
+    @Throws(IOException::class)
+    fun wsaRecv(overlapped: WSAOverlapped): Int {
+        return wsaRecv(ByteArray(1024), overlapped)
     }
 
     @Throws(IOException::class)

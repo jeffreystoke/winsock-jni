@@ -21,7 +21,7 @@ import com.github.jeffreystoke.winsock.io.struct.Socket;
 
 import java.io.IOException;
 
-public class SimpleClient implements Runnable {
+public class SimpleClient extends Thread {
 
     private Socket mSocket = new Socket();
 

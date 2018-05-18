@@ -16,6 +16,7 @@
 
 package com.github.jeffreystoke.winsock.io.model
 
+import com.github.jeffreystoke.winsock.io.constant.SocketError
 import com.github.jeffreystoke.winsock.io.internal.WinSock
 import com.github.jeffreystoke.winsock.io.struct.CompletionKey
 import com.github.jeffreystoke.winsock.io.struct.Socket
@@ -23,9 +24,7 @@ import com.github.jeffreystoke.winsock.io.struct.Struct
 import com.github.jeffreystoke.winsock.io.struct.WSAOverlapped
 import com.github.jeffreystoke.winsock.io.util.isNull
 
-class CompletionPortModel(val socket: Socket,
-                          otherCP: CompletionPortModel? = null,
-                          completionKey: CompletionKey) : Struct() {
+class CompletionPortModel() : Struct() {
 
     private var mCallback: Callback? = null
 
@@ -60,16 +59,25 @@ class CompletionPortModel(val socket: Socket,
     }
 
     init {
-        var _other_cp_ptr = 0L
-        if (otherCP != null) {
-            _other_cp_ptr = otherCP._ptr
-        }
-        _ptr = WinSock._create_iocp(socket.getPtr(), _other_cp_ptr, completionKey.getPtr())
+        _ptr = WinSock._create_iocp(SocketError.INVALID_SOCKET.value, 0, 0)
 
         if (_ptr.isNull()) {
             throw RuntimeException("创建 IOCP 失败")
         }
         iocps[_ptr] = this
+    }
+
+    fun create(completionKey: CompletionKey) {
+        WinSock._create_iocp(completionKey.socket.getPtr(), _ptr, completionKey.getPtr())
+    }
+
+    fun setCallback(callback: Callback) {
+        mCallback = callback
+    }
+
+    @Throws(RuntimeException::class)
+    fun createServerThreads() {
+        createServerThreads(Runtime.getRuntime().availableProcessors() * 2)
     }
 
     @Throws(RuntimeException::class)
@@ -86,7 +94,7 @@ class CompletionPortModel(val socket: Socket,
         return WinSock._post_queued_completion_status(_ptr, bytes, completionKey.getPtr(), overlapped.getPtr())
     }
 
-    fun cancel() {
+    fun cancel(socket: Socket) {
         WinSock._cancel_io(socket.getPtr())
     }
 }

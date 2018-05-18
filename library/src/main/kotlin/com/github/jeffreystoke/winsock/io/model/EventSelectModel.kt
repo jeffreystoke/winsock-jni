@@ -18,7 +18,6 @@ package com.github.jeffreystoke.winsock.io.model
 
 import com.github.jeffreystoke.winsock.io.constant.NetEvent
 import com.github.jeffreystoke.winsock.io.internal.WinSock
-import com.github.jeffreystoke.winsock.io.struct.Socket
 import com.github.jeffreystoke.winsock.io.struct.WSAEvent
 import com.github.jeffreystoke.winsock.io.util.mergedEvent
 
@@ -33,8 +32,8 @@ class EventSelectModel {
      *
      * @return Int
      */
-    fun run(socket: Socket, event: WSAEvent, caredNetEvents: Array<NetEvent>): Int =
-            WinSock._wsa_event_select(socket.getPtr(), event.getPtr(), caredNetEvents.mergedEvent())
+    fun run(event: WSAEvent, vararg caredNetEvents: NetEvent): Int =
+            WinSock._wsa_event_select(event.socket.getPtr(), event.getPtr(), caredNetEvents.mergedEvent())
 
     /**
      * 等待多个事件， 当一个发生时返回
@@ -44,7 +43,7 @@ class EventSelectModel {
      *
      * @return WSAEvent 发生事件的对象
      */
-    fun waitForMultipleEvents(events: Array<WSAEvent>, waitTimeout: Int): WSAEvent {
+    fun waitForMultipleEvents(events: List<WSAEvent>, waitTimeout: Int): WSAEvent {
         val index = WinSock._wsa_wait_for_multiple_events(events.size,
                 LongArray(events.size, { i -> events[i].getPtr() }),
                 false, waitTimeout, false)

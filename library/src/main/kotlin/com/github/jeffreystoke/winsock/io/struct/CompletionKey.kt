@@ -23,6 +23,8 @@ class CompletionKey(val socket: Socket,
                     val clientAddress: String = socket.address,
                     val clientPort: Int = socket.port) : Struct() {
 
+    constructor(socket: Socket) : this(socket, socket.address)
+
     companion object {
         private val keys by lazy { HashMap<Long, CompletionKey>() }
 

@@ -20,13 +20,14 @@ import com.github.jeffreystoke.winsock.examples.simple.SimpleClient;
 
 public class SelectTest {
     public static void main(String[] args) throws InterruptedException {
-        Thread selectServerT = new Thread(new SelectServer());
+        Thread selectServerT = new SelectServer();
 
         selectServerT.start();
         Thread.sleep(1000);
         for (int i = 0; i < 10; i++) {
-            new Thread(new SimpleClient()).start();
+            new SimpleClient().start();
         }
+        Thread.sleep(1000);
         selectServerT.interrupt();
 
     }
