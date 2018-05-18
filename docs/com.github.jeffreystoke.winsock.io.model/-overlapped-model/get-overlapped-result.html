@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>OverlappedModel.getOverlappedResult - library</title>
+<link rel="stylesheet" href="..\..\..\style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">library</a>&nbsp;/&nbsp;<a href="../index.html">com.github.jeffreystoke.winsock.io.model</a>&nbsp;/&nbsp;<a href="index.html">OverlappedModel</a>&nbsp;/&nbsp;<a href="./get-overlapped-result.html">getOverlappedResult</a><br/>
+<br/>
+<h1>getOverlappedResult</h1>
+<a name="com.github.jeffreystoke.winsock.io.model.OverlappedModel$getOverlappedResult(com.github.jeffreystoke.winsock.io.struct.WSAOverlapped, kotlin.Boolean, kotlin.Long)"></a>
+<code><span class="keyword">fun </span><span class="identifier">getOverlappedResult</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.OverlappedModel$getOverlappedResult(com.github.jeffreystoke.winsock.io.struct.WSAOverlapped, kotlin.Boolean, kotlin.Long)/overlapped">overlapped</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-w-s-a-overlapped/index.html"><span class="identifier">WSAOverlapped</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.OverlappedModel$getOverlappedResult(com.github.jeffreystoke.winsock.io.struct.WSAOverlapped, kotlin.Boolean, kotlin.Long)/wait">wait</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.OverlappedModel$getOverlappedResult(com.github.jeffreystoke.winsock.io.struct.WSAOverlapped, kotlin.Boolean, kotlin.Long)/flag">flag</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html"><span class="identifier">Long</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>返回重叠IO操作结果</p>
+<h3>Parameters</h3>
+<p><a name="overlapped"></a>
+<code>overlapped</code> - WSAOverlapped 结构, 包含 WSAEvent,
+    WSAEvent 内部需要是 WSASocket 对象</p>
+<p><a name="wait"></a>
+<code>wait</code> - 等待重叠操作完成</p>
+<p><a name="flag"></a>
+<code>flag</code> - 完成状态的附加标志</p>
+<p><strong>Return</strong><br/>
+Int          实际传输数据量, -1 表示出错</p>
+</BODY>
+</HTML>

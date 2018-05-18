@@ -1,0 +1,8 @@
+$dokka.format:html
+$dokka.linkExtension:html
+$dokka.location:com.github.jeffreystoke.winsock.io.util$isNull(kotlin.Long)com.github.jeffreystoke.winsock.io.util/kotlin.-long/is-null.html
+$dokka.location:com.github.jeffreystoke.winsock.io.util$mergedEvent(kotlin.Array((com.github.jeffreystoke.winsock.io.constant.NetEvent)))com.github.jeffreystoke.winsock.io.util/kotlin.-array/merged-event.html
+com.github.jeffreystoke.winsock.io.constant
+com.github.jeffreystoke.winsock.io.model
+com.github.jeffreystoke.winsock.io.struct
+com.github.jeffreystoke.winsock.io.util

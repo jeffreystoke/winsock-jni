@@ -46,6 +46,10 @@ Gradle will download essential packages and build, output is `library/build/libs
 
 // TODO
 
+## Documentation
+
+see [jeffreystoke.github.io/winsock-api](https://jeffreystoke.github.io/winsock-api)
+
 ## Note
 
 - support Windows Platform only

@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>SelectModel - library</title>
+<link rel="stylesheet" href="..\..\..\style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">library</a>&nbsp;/&nbsp;<a href="../index.html">com.github.jeffreystoke.winsock.io.model</a>&nbsp;/&nbsp;<a href="./index.html">SelectModel</a><br/>
+<br/>
+<h1>SelectModel</h1>
+<code><span class="keyword">class </span><span class="identifier">SelectModel</span></code>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">SelectModel</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$<init>(com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet)/readFdSet">readFdSet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-fd-set/index.html"><span class="identifier">FdSet</span></a>&nbsp;<span class="symbol">=</span>&nbsp;FdSet()<span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$<init>(com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet)/writeFdSet">writeFdSet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-fd-set/index.html"><span class="identifier">FdSet</span></a>&nbsp;<span class="symbol">=</span>&nbsp;FdSet()<span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$<init>(com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet, com.github.jeffreystoke.winsock.io.struct.FdSet)/exceptionFdSet">exceptionFdSet</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-fd-set/index.html"><span class="identifier">FdSet</span></a>&nbsp;<span class="symbol">=</span>&nbsp;FdSet()<span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="add-exception-fd.html">addExceptionFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">addExceptionFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$addExceptionFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>添加将监听出错事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="add-read-fd.html">addReadFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">addReadFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$addReadFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>添加将监听读(接收)事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="add-write-fd.html">addWriteFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">addWriteFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$addWriteFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>添加将监听写(发送)事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="clear.html">clear</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">clear</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>清空内部所有 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-exception-set-socket.html">getExceptionSetSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getExceptionSetSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code>
+<p>获取发生出错事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-read-set-socket.html">getReadSetSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getReadSetSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code>
+<p>获取发生读(接收)事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="get-write-set-socket.html">getWriteSetSocket</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getWriteSetSocket</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">?</span></code>
+<p>获取发生写(发送)事件的 Socket</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-exception-fd.html">removeExceptionFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">removeExceptionFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$removeExceptionFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>移除监听出错事件的 Socket, Socket 本身不受影响</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-read-fd.html">removeReadFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">removeReadFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$removeReadFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>移除监听读(接收)事件的 Socket, Socket 本身不受影响</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="remove-write-fd.html">removeWriteFd</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">removeWriteFd</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$removeWriteFd(com.github.jeffreystoke.winsock.io.struct.Socket)/s">s</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.struct/-socket/index.html"><span class="identifier">Socket</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>移除监听写(发送)事件的 Socket, Socket 本身不受影响</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="run.html">run</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">run</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.model.SelectModel$run(kotlin.Int)/timeout">timeout</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>开始一次 select</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

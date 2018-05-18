@@ -1,0 +1,186 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Socket - library</title>
+<link rel="stylesheet" href="..\..\..\style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">library</a>&nbsp;/&nbsp;<a href="../index.html">com.github.jeffreystoke.winsock.io.struct</a>&nbsp;/&nbsp;<a href="./index.html">Socket</a><br/>
+<br/>
+<h1>Socket</h1>
+<code><span class="keyword">open</span> <span class="keyword">class </span><span class="identifier">Socket</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="../-struct/index.html"><span class="identifier">Struct</span></a></code>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">Socket</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$<init>(com.github.jeffreystoke.winsock.io.constant.AddressFamily, com.github.jeffreystoke.winsock.io.constant.SocketType, com.github.jeffreystoke.winsock.io.constant.ProtocolType)/addressFamily">addressFamily</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-address-family/index.html"><span class="identifier">AddressFamily</span></a>&nbsp;<span class="symbol">=</span>&nbsp;AddressFamily.Internet<span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$<init>(com.github.jeffreystoke.winsock.io.constant.AddressFamily, com.github.jeffreystoke.winsock.io.constant.SocketType, com.github.jeffreystoke.winsock.io.constant.ProtocolType)/type">type</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-socket-type/index.html"><span class="identifier">SocketType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;SocketType.Stream<span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$<init>(com.github.jeffreystoke.winsock.io.constant.AddressFamily, com.github.jeffreystoke.winsock.io.constant.SocketType, com.github.jeffreystoke.winsock.io.constant.ProtocolType)/protocol">protocol</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-protocol-type/index.html"><span class="identifier">ProtocolType</span></a>&nbsp;<span class="symbol">=</span>&nbsp;ProtocolType.TCP<span class="symbol">)</span></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="address.html">address</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">address</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="port.html">port</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">port</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-struct/_ptr.html">_ptr</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">_ptr</span><span class="symbol">: </span><a href="../../com.github.jeffreystoke.winsock.io.util/-pointer.html"><span class="identifier">Pointer</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="accept.html">accept</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">accept</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="./index.html"><span class="identifier">Socket</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="bind.html">bind</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">bind</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$bind(kotlin.String, kotlin.Int)/address">address</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$bind(kotlin.String, kotlin.Int)/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="close.html">close</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">close</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="connect.html">connect</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">connect</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$connect(kotlin.String, kotlin.Int)/address">address</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$connect(kotlin.String, kotlin.Int)/port">port</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="get-option.html">getOption</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">getOption</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$getOption(com.github.jeffreystoke.winsock.io.constant.SocketOption)/optionName">optionName</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-socket-option/index.html"><span class="identifier">SocketOption</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="listen.html">listen</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">listen</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code><br/>
+<code><span class="keyword">fun </span><span class="identifier">listen</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$listen(kotlin.Int)/backlog">backlog</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;0<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="recv.html">recv</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">recv</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a></code><br/>
+<code><span class="keyword">fun </span><span class="identifier">recv</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$recv(kotlin.ByteArray, kotlin.Int)/buf">buf</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a>&nbsp;<span class="symbol">=</span>&nbsp;ByteArray(1024)<span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$recv(kotlin.ByteArray, kotlin.Int)/flag">flag</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;0<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="recv-from.html">recvFrom</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">recvFrom</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$recvFrom(kotlin.Int)/flag">flag</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;0<span class="symbol">)</span><span class="symbol">: </span><a href="../-u-d-p-packet/index.html"><span class="identifier">UDPPacket</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="send.html">send</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">send</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$send(kotlin.ByteArray)/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code><br/>
+<code><span class="keyword">fun </span><span class="identifier">send</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$send(kotlin.ByteArray, kotlin.Int)/data">data</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$send(kotlin.ByteArray, kotlin.Int)/flag">flag</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;0<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="send-to.html">sendTo</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">sendTo</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$sendTo(com.github.jeffreystoke.winsock.io.struct.UDPPacket, kotlin.Int)/udpPacket">udpPacket</span><span class="symbol">:</span>&nbsp;<a href="../-u-d-p-packet/index.html"><span class="identifier">UDPPacket</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$sendTo(com.github.jeffreystoke.winsock.io.struct.UDPPacket, kotlin.Int)/flag">flag</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;0<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="set-non-block.html">setNonBlock</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setNonBlock</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$setNonBlock(kotlin.Boolean)/enable">enable</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="set-option.html">setOption</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setOption</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$setOption(com.github.jeffreystoke.winsock.io.constant.SocketOption, kotlin.ByteArray)/optionName">optionName</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-socket-option/index.html"><span class="identifier">SocketOption</span></a><span class="symbol">, </span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$setOption(com.github.jeffreystoke.winsock.io.constant.SocketOption, kotlin.ByteArray)/optionValue">optionValue</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte-array/index.html"><span class="identifier">ByteArray</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="shutdown.html">shutdown</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">shutdown</span><span class="symbol">(</span><span class="identifier" id="com.github.jeffreystoke.winsock.io.struct.Socket$shutdown(com.github.jeffreystoke.winsock.io.constant.ShutdownOption)/how">how</span><span class="symbol">:</span>&nbsp;<a href="../../com.github.jeffreystoke.winsock.io.constant/-shutdown-option/index.html"><span class="identifier">ShutdownOption</span></a>&nbsp;<span class="symbol">=</span>&nbsp;ShutdownOption.Both<span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inherited Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-struct/destroy.html">destroy</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">destroy</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<p><a href="../-struct/get-ptr.html">getPtr</a></p>
+</td>
+<td>
+<code><span class="keyword">open</span> <span class="keyword">fun </span><span class="identifier">getPtr</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="../../com.github.jeffreystoke.winsock.io.util/-pointer.html"><span class="identifier">Pointer</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../-w-s-a-socket/index.html">WSASocket</a></p>
+</td>
+<td>
+<code><span class="keyword">class </span><span class="identifier">WSASocket</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">Socket</span></a></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -46,6 +46,10 @@ Gradle 将会下载必要的依赖并开始构建, 输出结果 `build/libs/wins
 
 // TODO
 
+## 文档
+
+见 [jeffreystoke.github.io/winsock-api](https://jeffreystoke.github.io/winsock-api)
+
 ## 注意
 
 - 仅支持 Windows 平台
