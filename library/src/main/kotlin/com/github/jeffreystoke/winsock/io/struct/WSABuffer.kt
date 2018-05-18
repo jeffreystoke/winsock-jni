@@ -13,8 +13,7 @@ class WSABuffer(val size: Int = 256) : Struct() {
     }
 
     fun get(): ByteArray {
-        // TODO impl native get
-        return ByteArray(0)
+        return WinSock._get_wsa_buf(_ptr)
     }
 
     fun getString(): String {

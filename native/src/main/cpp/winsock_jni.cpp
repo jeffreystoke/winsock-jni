@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1free(
     JNIEnv *env, jclass clazz, jlong ptr)
 {
-    free(reinterpret_cast<void *>(ptr));
+    delete reinterpret_cast<void *>(ptr);
 }
 
 /*
@@ -87,8 +87,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1setsockopt(
     auto len = env->GetArrayLength(optVal);
     auto buf = new char[len];
     env->GetByteArrayRegion(optVal, 0, len, reinterpret_cast<jbyte *>(buf));
-
-    return setsockopt((SOCKET)socket, level, optKey, buf, len);
+    int ret = setsockopt(static_cast<SOCKET>(socket), level, optKey, buf, len);
+    delete buf;
+    return ret;
 }
 
 /*
@@ -103,8 +104,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1getsockopt(
     int len = env->GetArrayLength(retBuf);
     auto buf = new char[len];
     auto ret = getsockopt(static_cast<SOCKET>(socket), level, optKey, buf, &len);
-    // jbyteArray array = env->NewByteArray(len);
     env->SetByteArrayRegion(retBuf, 0, len, reinterpret_cast<jbyte *>(buf));
+    delete buf;
     return ret;
 }
 
@@ -147,8 +148,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1bind(
     sin.sin_port = htons((u_short)port);
     auto addr = env->GetStringUTFChars(address, nullptr);
     sin.sin_addr.s_addr = inet_addr(addr);
+    env->ReleaseStringUTFChars(address, addr);
 
-    bind((SOCKET)socket, (LPSOCKADDR)&sin, sizeof(sin));
+    bind(static_cast<SOCKET>(socket), (LPSOCKADDR)&sin, sizeof(sin));
 }
 
 /*
@@ -160,7 +162,7 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1listen(
     JNIEnv *env, jclass clazz, jlong socket, jint backlog)
 {
-    return listen((SOCKET)socket, backlog);
+    return listen(static_cast<SOCKET>(socket), backlog);
 }
 
 /*
@@ -174,16 +176,17 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1accept(
 {
 
     sockaddr_in sin{};
-    int len = sizeof(sin);
+    int len = sizeof(sockaddr_in);
     SOCKET ret = accept(static_cast<SOCKET>(socket), reinterpret_cast<sockaddr *>(&sin), &len);
 
     int addressBufLen = env->GetArrayLength(addressBuf);
     char *address_buf = new char[addressBufLen];
     for (int i = 0; i < addressBufLen; ++i)
     {
-        address_buf[i] = (sin.sin_addr.s_addr >> (8 *i)) & 0xFF;
+        address_buf[i] = (sin.sin_addr.s_addr >> (8 * i)) & 0xFF;
     }
     env->SetByteArrayRegion(addressBuf, 0, addressBufLen, reinterpret_cast<jbyte *>(address_buf));
+    delete address_buf;
 
     int portBufLen = env->GetArrayLength(portBuf);
     char *port_buf = new char[portBufLen];
@@ -192,6 +195,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1accept(
         port_buf[i] = ((sin.sin_port >> (8 * i)) & 0XFF);
     }
     env->SetByteArrayRegion(portBuf, 0, portBufLen, reinterpret_cast<jbyte *>(port_buf));
+    delete port_buf;
 
     return (jlong)ret;
 }
@@ -207,8 +211,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv(
 {
     int len = env->GetArrayLength(recvBuf);
     auto buf = new char[len];
-    int ret = recv((SOCKET)socket, buf, len, flag);
+    int ret = recv(static_cast<SOCKET>(socket), buf, len, flag);
     env->SetByteArrayRegion(recvBuf, 0, len, reinterpret_cast<jbyte *>(buf));
+    delete buf;
     return ret;
 }
 
@@ -224,7 +229,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send(
     int len = env->GetArrayLength(sendBuf);
     auto buf = new char[len];
     env->GetByteArrayRegion(sendBuf, 0, len, reinterpret_cast<jbyte *>(buf));
-    return send((SOCKET)socket, buf, len, flag);
+    int ret = send(static_cast<SOCKET>(socket), buf, len, flag);
+    delete buf;
+    return ret;
 }
 
 /*
@@ -266,6 +273,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1connect(
     sin.sin_port = htons((u_short)port);
     auto addr = env->GetStringUTFChars(rAddress, nullptr);
     sin.sin_addr.s_addr = inet_addr(addr);
+    env->ReleaseStringUTFChars(rAddress, addr);
 
     return connect(static_cast<SOCKET>(socket), reinterpret_cast<const sockaddr *>(&sin), sizeof(sin));
 }
@@ -283,16 +291,18 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv_1from(
     int addr_len = sizeof(sin);
     int len = env->GetArrayLength(recvBuf);
     auto buf = new char[len];
-    int ret = recvfrom((SOCKET)socket, buf, len, flag, (SOCKADDR *)&sin, &addr_len);
+    int ret = recvfrom(static_cast<SOCKET>(socket), buf, len, flag, (SOCKADDR *)&sin, &addr_len);
     env->SetByteArrayRegion(recvBuf, 0, len, reinterpret_cast<jbyte *>(buf));
+    delete buf;
 
     int addressBufLen = env->GetArrayLength(recvBuf);
     char *address_buf = new char[addressBufLen];
     for (int i = 0; i < addressBufLen; ++i)
     {
-        address_buf[i] = (sin.sin_addr.s_addr >> (8 *i)) & 0xFF;
+        address_buf[i] = (sin.sin_addr.s_addr >> (8 * i)) & 0xFF;
     }
     env->SetByteArrayRegion(addressBuf, 0, addressBufLen, reinterpret_cast<jbyte *>(address_buf));
+    delete address_buf;
 
     int portBufLen = env->GetArrayLength(portBuf);
     char *port_buf = new char[portBufLen];
@@ -301,6 +311,8 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1recv_1from(
         port_buf[i] = ((sin.sin_port >> (8 * i)) & 0XFF);
     }
     env->SetByteArrayRegion(portBuf, 0, portBufLen, reinterpret_cast<jbyte *>(port_buf));
+    delete port_buf;
+
     return ret;
 }
 
@@ -319,10 +331,13 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send_1to(
     sin.sin_port = htons((u_short)port);
     auto addr = env->GetStringUTFChars(rAddress, nullptr);
     sin.sin_addr.s_addr = inet_addr(addr);
+    env->ReleaseStringUTFChars(rAddress, addr);
 
     char *c_buf = new char[len];
-    int ret = sendto((SOCKET)socket, c_buf, len, flag, (SOCKADDR *)&sin, sizeof(sin));
+    int ret = sendto(static_cast<SOCKET>(socket), c_buf, len, flag, (SOCKADDR *)&sin, sizeof(sin));
     env->SetByteArrayRegion(buf, 0, len, reinterpret_cast<jbyte *>(c_buf));
+    delete c_buf;
+
     return ret;
 }
 
@@ -335,7 +350,7 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1fd_1set(
     JNIEnv *env, jclass clazz)
 {
-    auto fdSet = static_cast<fd_set *>(malloc(sizeof(fd_set)));
+    fd_set *fdSet = new fd_set{};
     FD_ZERO(fdSet);
     return (jlong)fdSet;
 }
@@ -349,7 +364,7 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1add_1fd(
     JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
 {
-    FD_SET((SOCKET)socket, (fd_set *)fdset);
+    FD_SET(static_cast<SOCKET>(socket), (fd_set *)fdset);
 }
 
 /*
@@ -361,7 +376,7 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1remove_1fd(
     JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
 {
-    FD_CLR((SOCKET)socket, (fd_set *)fdset);
+    FD_CLR(static_cast<SOCKET>(socket), (fd_set *)fdset);
 }
 
 /*
@@ -453,8 +468,10 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1wait_1for_1multi
     {
         events[i] = (WSAEVENT)array[i];
     }
+    int ret = WSAWaitForMultipleEvents(count, events, wait, timeout, alertable);
+    delete events;
 
-    return WSAWaitForMultipleEvents(count, events, wait, timeout, alertable);
+    return ret;
 }
 
 /*
@@ -466,7 +483,7 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1event_1select(
     JNIEnv *env, jclass clazz, jlong socket, jlong event, jlong netEvent)
 {
-    return WSAEventSelect((SOCKET)socket, (WSAEVENT)event, (long)netEvent);
+    return WSAEventSelect(static_cast<SOCKET>(socket), (WSAEVENT)event, (long)netEvent);
 }
 
 /*
@@ -479,7 +496,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1enum_1network_1e
     JNIEnv *env, jclass clazz, jlong socket, jlong event, jbyteArray bufForLong, jbyteArray bufForInt)
 {
     WSANETWORKEVENTS e;
-    int ret = WSAEnumNetworkEvents((SOCKET)socket, (WSAEVENT)event, &e);
+    int ret = WSAEnumNetworkEvents(static_cast<SOCKET>(socket), (WSAEVENT)event, &e);
 
     int len = env->GetArrayLength(bufForLong);
     char *long_buf = new char[len];
@@ -488,6 +505,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1enum_1network_1e
         long_buf[i] = ((e.lNetworkEvents >> (8 * i)) & 0XFF);
     }
     env->SetByteArrayRegion(bufForLong, 0, len, reinterpret_cast<jbyte *>(long_buf));
+    delete long_buf;
 
     len = env->GetArrayLength(bufForInt);
     char *int_buf = new char[len];
@@ -499,6 +517,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1enum_1network_1e
         }
     }
     env->SetByteArrayRegion(bufForInt, 0, len, reinterpret_cast<jbyte *>(int_buf));
+    delete int_buf;
 
     return ret;
 }
@@ -531,7 +550,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
     {
         buf[i] = *((WSABUF *)array[i]);
     }
-    return WSARecv((SOCKET)socket, buf, len, (LPDWORD)count, (LPDWORD)flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    int ret = WSARecv(static_cast<SOCKET>(socket), buf, len, (LPDWORD)count, (LPDWORD)flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    delete buf;
+    return ret;
 }
 
 /*
@@ -550,7 +571,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
     {
         buf[i] = *((WSABUF *)array[i]);
     }
-    return WSASend((SOCKET)socket, buf, len, (LPDWORD)count, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    int ret = WSASend(static_cast<SOCKET>(socket), buf, len, (LPDWORD)count, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
+    delete buf;
+    return ret;
 }
 
 /*
@@ -562,8 +585,8 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1buf(
     JNIEnv *env, jclass clazz, jint size)
 {
-    auto buf = (WSABUF *)malloc(sizeof(WSABUF));
-    buf->buf = (char *)malloc(sizeof(char) * size);
+    WSABUF *buf = new WSABUF{};
+    buf->buf = new char[size];
     buf->len = (u_long)size;
     return (jlong)buf;
 }
@@ -577,9 +600,24 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1wsa_1buf(
     JNIEnv *env, jobject obj, jlong buf)
 {
-    auto wsaBuf = (WSABUF *)buf;
-    free(wsaBuf->buf);
-    free((void *)buf);
+    WSABUF *wsaBuf = (WSABUF *)buf;
+    delete wsaBuf->buf;
+    delete wsaBuf;
+}
+
+/*
+ * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
+ * Method:    _get_wsa_buf
+ * Signature: (J)V
+ */
+JNIEXPORT jbyteArray JNICALL
+Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1wsa_1buf(
+    JNIEnv *env, jobject obj, jlong buf)
+{
+    WSABUF *wsaBuf = (WSABUF *)buf;
+    auto ret = env->NewByteArray(wsaBuf->len);
+    env->SetByteArrayRegion(ret, 0, wsaBuf->len, reinterpret_cast<jbyte *>(wsaBuf->buf));
+    return ret;
 }
 
 typedef struct _completionKey
@@ -598,13 +636,14 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1completion_1k
     JNIEnv *env, jclass clazz, jlong socket, jstring address, jint port)
 {
     COMPLETION_KEY *key = new COMPLETION_KEY{};
-    key->s = (SOCKET)socket;
+    key->s = static_cast<SOCKET>(socket);
     sockaddr_in *sin = new sockaddr_in{};
     sin->sin_family = AF_INET;
     sin->sin_port = htons((u_short)port);
     auto addr = env->GetStringUTFChars(address, nullptr);
     sin->sin_addr.s_addr = inet_addr(addr);
-    key->remote_addr = (SOCKADDR_IN *)sin;
+    env->ReleaseStringUTFChars(address, addr);
+    key->remote_addr = (SOCKADDR_IN *) sin;
     return (jlong)key;
 }
 
@@ -617,7 +656,7 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapped(
     JNIEnv *env, jclass clazz, jint internal, jint internalHigh, jint offset, jint offsetHigh, jlong evnet)
 {
-    auto o = (WSAOVERLAPPED *)malloc(sizeof(WSAOVERLAPPED));
+    WSAOVERLAPPED *o = new WSAOVERLAPPED{};
     o->Internal = internal;
     o->InternalHigh = internalHigh;
     o->Offset = offset;
@@ -634,7 +673,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
     JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jint count, jboolean wait, jlong flag)
 {
-    return WSAGetOverlappedResult((SOCKET)socket, (LPWSAOVERLAPPED)overlapped, reinterpret_cast<LPDWORD>(count), wait, reinterpret_cast<PDWORD>(flag));
+    return WSAGetOverlappedResult(static_cast<SOCKET>(socket), (LPWSAOVERLAPPED)overlapped, reinterpret_cast<LPDWORD>(count), wait, reinterpret_cast<PDWORD>(flag));
 }
 
 /*
@@ -658,7 +697,7 @@ JNIEXPORT jboolean JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1queued_1completion_1status(
     JNIEnv *, jclass, jlong cp, jint count, jlong completionKey, jlong overlapped, jint waitTimeout)
 {
-    return GetQueuedCompletionStatus((HANDLE)cp, reinterpret_cast<LPDWORD>(count), reinterpret_cast<PULONG_PTR>(completionKey), (LPOVERLAPPED *) overlapped, waitTimeout);
+    return GetQueuedCompletionStatus((HANDLE)cp, reinterpret_cast<LPDWORD>(count), reinterpret_cast<PULONG_PTR>(completionKey), (LPOVERLAPPED *)overlapped, waitTimeout);
 }
 
 /*
