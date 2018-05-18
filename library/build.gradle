@@ -23,7 +23,7 @@ apply plugin: 'org.jetbrains.dokka'
 def nativeProject = rootProject.file('native')
 
 dokka {
-    outputFormat = 'html'
+    outputFormat = 'javadoc'
     outputDirectory = "$rootDir/docs"
 
     linkMapping {
