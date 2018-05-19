@@ -12,11 +12,11 @@ WinSock API 的 Java 封装 (使用 JNI)
 
 ## 特性
 
-- Windows 原生 Socket
-- Select模型
-- WSAEventSelect 模型
-- 重叠 IO 模型
-- IOCP 模型
+- Windows 原生 Socket (已完成)
+- Select模型 (已完成)
+- WSAEventSelect 模型 (已完成)
+- 重叠 IO 模型 (进行中)
+- IOCP 模型 (已完成)
 
 注: WSAAsyncSelect 由于需要 WinMain 入口无法支持
 
@@ -25,14 +25,6 @@ WinSock API 的 Java 封装 (使用 JNI)
 ## JAR
 
 自行构建, 导入生成的 Jar 即可
-
-## Maven
-
-// TODO
-
-## Gradle
-
-// TODO
 
 ## 构建
 
@@ -44,7 +36,7 @@ Gradle 将会下载必要的依赖并开始构建, 输出结果 `build/libs/wins
 
 ## 示例
 
-// TODO
+见 [examples](./examples)
 
 ## 文档
 

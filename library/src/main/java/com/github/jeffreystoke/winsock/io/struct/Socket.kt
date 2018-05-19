@@ -37,6 +37,7 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
 
     var address: String = ""
     var port: Int = 0
+    var selectEvent: NetEvent? = null
 
     internal constructor(socket: Pointer) : this() {
         _ptr = socket
@@ -47,6 +48,8 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
         if (_ptr.isNull()) {
             throw RuntimeException("无法创建 socket 对象")
         }
+
+        sSockets[_ptr] = this
     }
 
     fun setNonBlock(enable: Boolean) {
@@ -188,7 +191,7 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other != null) {
+        if (other == null) {
             return false
         }
 

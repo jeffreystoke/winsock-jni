@@ -371,73 +371,48 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1send_1to(
 
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _create_fd_set
- * Signature: ()J
- */
-JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1fd_1set(
-    JNIEnv *env, jclass clazz)
-{
-    fd_set *fdSet = new fd_set{};
-    FD_ZERO(fdSet);
-    return (jlong)fdSet;
-}
-
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _add_fd
- * Signature: (JJ)V
- */
-JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1add_1fd(
-    JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
-{
-    FD_SET((SOCKET)socket, (fd_set *)fdset);
-}
-
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _remove_fd
- * Signature: (JJ)V
- */
-JNIEXPORT void JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1remove_1fd(
-    JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
-{
-    FD_CLR(static_cast<SOCKET>(socket), (fd_set *)fdset);
-}
-
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
- * Method:    _getSetFd
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL
-Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1get_1set_1fd(
-    JNIEnv *env, jclass clazz, jlong fdset)
-{
-    auto fdSocket = ((fd_set *)fdset);
-
-    for (int i = 0; i < (int)fdSocket->fd_count; i++)
-    {
-        if (FD_ISSET(fdSocket->fd_array[i], fdSocket))
-        {
-            return (jlong)fdSocket->fd_array[i];
-        }
-    }
-
-    return 0;
-}
-
-/*
- * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _select
- * Signature: (JJJI)I
+ * Signature: ([Ljava/lang/Long;[Ljava/lang/Long;[Ljava/lang/Long;I)I
  */
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(
-    JNIEnv *env, jclass clazz, jlong readFds, jlong writeFds, jlong exceptionFds, jint waitTimeout)
+    JNIEnv *env, jclass clazz, jlongArray readFds, jlongArray writeFds, jlongArray exceptionFds, jint waitTimeout, jbyteArray bufForLong)
 {
+    // create read fd_set
+    int len = env->GetArrayLength(readFds);
+    jlong *c_read_fds = env->GetLongArrayElements(readFds, nullptr);
+    fd_set rfds;
+    FD_ZERO(&rfds);
+    for (int i = 0; i < len; ++i)
+    {
+        // printf("rfds index %d, socket %d\n", i, c_read_fds[i]);
+        FD_SET((SOCKET)c_read_fds[i], &rfds);
+    }
+    env->ReleaseLongArrayElements(readFds, c_read_fds, 0);
+
+    // create write fd_set
+    fd_set wfds;
+    FD_ZERO(&wfds);
+    len = env->GetArrayLength(writeFds);
+    jlong *c_write_fds = env->GetLongArrayElements(writeFds, nullptr);
+    for (int i = 0; i < len; ++i)
+    {
+        // printf("wfds index %d, socket %d\n", i, c_read_fds[i]);
+        FD_SET((SOCKET)c_write_fds[i], &wfds);
+    }
+    env->ReleaseLongArrayElements(writeFds, c_write_fds, 0);
+
+    // create exception fd_set
+    len = env->GetArrayLength(exceptionFds);
+    fd_set efds;
+    jlong *c_except_fds = env->GetLongArrayElements(exceptionFds, nullptr);
+    FD_ZERO(&efds);
+    for (int i = 0; i < len; ++i)
+    {
+        // printf("efds index %d, socket %d\n", i, c_read_fds[i]);
+        FD_SET((SOCKET)c_except_fds[i], &efds);
+    }
+    env->ReleaseLongArrayElements(exceptionFds, c_except_fds, 0);
 
     timeval *wTime = new timeval{};
     if (waitTimeout == 0)
@@ -450,22 +425,69 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(
         wTime->tv_sec = waitTimeout / 1000;
         wTime->tv_usec = waitTimeout % 1000;
     }
-
-    // int len = env->GetArrayLength(readFds);
-    // jlong * c_read_fds = env->GetLongArrayElements(readFds, nullptr);
-    // fd_set rfds;
-    // FD_ZERO(&rfds);
-    // for (int i = 0; i < len; ++i) {
-    //     FD_SET(c_read_fds[i], &rfds);
-    // }
-    // return select(0, (fd_set *)readFds, (fd_set *)writeFds, (fd_set *)exceptionFds, &wTime);
-    fd_set *rfds = (fd_set *)readFds;
-    printf("rfds addr: %p\n", rfds);
-    int ret = select(sizeof(((fd_set *)readFds)) * 8, (fd_set *)readFds, nullptr, nullptr, wTime);
-    printf("retval %d\n", ret);
+    
+    // start select
+    int ret = select(sizeof(rfds) * 8 * 3, &rfds, &wfds, &efds, wTime);
     delete wTime;
 
-    return ret;
+    // check result
+    if (ret < 1)
+    {
+        return ret;
+    }
+
+    // rfds
+    for (int i = 0; i < rfds.fd_count; i++)
+    {
+        if (FD_ISSET(rfds.fd_array[i], &rfds))
+        {
+            len = env->GetArrayLength(bufForLong);
+            char *long_buf = new char[len];
+            for (auto i = 0; i < len; i++)
+            {
+                long_buf[i] = ((FD_READ >> (8 * i)) & 0XFF);
+            }
+            env->SetByteArrayRegion(bufForLong, 0, len, reinterpret_cast<jbyte *>(long_buf));
+            delete long_buf;
+            return (jlong)rfds.fd_array[i];
+        }
+    }
+
+    // wfds
+    for (int i = 0; i < wfds.fd_count; i++)
+    {
+        if (FD_ISSET(wfds.fd_array[i], &wfds))
+        {
+            len = env->GetArrayLength(bufForLong);
+            char *long_buf = new char[len];
+            for (auto i = 0; i < len; i++)
+            {
+                long_buf[i] = ((FD_WRITE >> (8 * i)) & 0XFF);
+            }
+            env->SetByteArrayRegion(bufForLong, 0, len, reinterpret_cast<jbyte *>(long_buf));
+            delete long_buf;
+            return (jlong)wfds.fd_array[i];
+        }
+    }
+
+    // efds
+    for (int i = 0; i < efds.fd_count; i++)
+    {
+        if (FD_ISSET(efds.fd_array[i], &efds))
+        {
+            len = env->GetArrayLength(bufForLong);
+            char *long_buf = new char[len];
+            for (auto i = 0; i < len; i++)
+            {
+                long_buf[i] = ((FD_CLOSE >> (8 * i)) & 0XFF);
+            }
+            env->SetByteArrayRegion(bufForLong, 0, len, reinterpret_cast<jbyte *>(long_buf));
+            delete long_buf;
+            return (jlong)efds.fd_array[i];
+        }
+    }
+
+    return (jlong)ret;
 }
 
 /*
@@ -717,7 +739,7 @@ DWORD WINAPI ServerWorkerThread(LPVOID cp)
         {
             // io error, oops
             // destroy_op_body(op_body);
-            
+
             JNIEnv *g_env;
             jvm->AttachCurrentThread((void **)&g_env, NULL);
             printf("[NET] error %d\n", err);
@@ -827,7 +849,7 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
     JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jboolean wait, jlong flag)
 {
-    io_op_body_s *body = (io_op_body_s *) overlapped;
+    io_op_body_s *body = (io_op_body_s *)overlapped;
     DWORD count = 0;
     if (WSAGetOverlappedResult(static_cast<SOCKET>(socket), &body->overlapped, &count, wait, reinterpret_cast<PDWORD>(flag)))
     {

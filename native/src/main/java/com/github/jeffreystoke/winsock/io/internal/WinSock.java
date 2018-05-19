@@ -109,16 +109,8 @@ public class WinSock {
     // sendto()
     public static native int _send_to(long s, byte[] buf, int flag, String remoteAddress, int port);
 
-    public static native long _create_fd_set();
-
-    public static native void _add_fd(long fdSet, long s);
-
-    public static native void _remove_fd(long fdSet, long s);
-
-    public static native long _get_set_fd(long fdSet);
-
     // select()
-    public static native int _select(long readFDs, long writeFDs, long exceptionFDs, int timeout);
+    public static native long _select(long[] readFDs, long[] writeFDs, long[] exceptionFDs, int timeout, byte[] bufForLong);
 
     // WSACreateEvent()
     public static native long _wsa_create_event();

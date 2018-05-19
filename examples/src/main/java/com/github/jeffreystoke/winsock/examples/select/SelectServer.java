@@ -22,6 +22,7 @@ import com.github.jeffreystoke.winsock.io.model.SelectModel;
 import com.github.jeffreystoke.winsock.io.struct.Socket;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class SelectServer extends Server {
 
@@ -42,39 +43,45 @@ public class SelectServer extends Server {
                 break;
             }
 
-            if (sm.run(0) < 1) {
-                println("select failed");
+            Socket s;
+            try {
+                s = sm.select(0);
+                if (s == null) {
+                    continue;
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace();
                 break;
             }
 
-            Socket s = sm.getReadSetSocket();
-            if (s == null) {
-                continue;
-            }
-
-            if (s.equals(mServerSocket)) {
-                try {
-                    println("accept");
-                    Socket client = mServerSocket.accept();
-                    println("client connected");
-                    sm.addReadSocket(client);
-                    println("client added to read fd set");
-                    client.send(Constants.sMessage.getBytes());
-                    println("sent message");
-                } catch (IOException e) {
-                    println("accept error", e.getMessage());
-                }
-            } else {
-                try {
-                    println("client message", new String(s.recv()));
-                } catch (IOException e) {
-                    println("recv error ", e.getMessage());
-                    try {
-                        s.close();
-                    } catch (IOException e1) {
-                        println("close error ", e1.getMessage());
+            switch (Objects.requireNonNull(s.getSelectEvent())) {
+                case FD_READ: // happen on read fds
+                    if (s.equals(mServerSocket)) {
+                        try {
+                            println("accept");
+                            Socket client = mServerSocket.accept();
+                            println("client connected");
+                            sm.addReadSocket(client);
+                            println("client added to read fd set");
+                            client.send(Constants.sMessage.getBytes());
+                            println("sent message");
+                        } catch (IOException e) {
+                            println("accept error", e.getMessage());
+                        }
+                    } else {
+                        try {
+                            println("client message", new String(s.recv()));
+                        } catch (IOException e) {
+                            println("recv error ", e.getMessage());
+                            try {
+                                s.close();
+                            } catch (IOException e1) {
+                                println("close error ", e1.getMessage());
+                            }
+                        }
                     }
-                }
+                case FD_WRITE: // happen on write fds
+                case FD_CLOSE: // happen on exception fds
             }
         }
     }

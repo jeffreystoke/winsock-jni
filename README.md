@@ -12,11 +12,11 @@ Give a try for using Java to do something windows native, and learn windows IO m
 
 ## Features
 
-- Windows native socket
-- Select IO Model
-- WSAEventSelect Model
-- Overlapped IO Model
-- Completion Port
+- Windows native socket (done)
+- Select IO Model (done)
+- WSAEventSelect Model (done)
+- Overlapped IO Model (ongoing)
+- Completion Port (done)
 
 Note: WSAAsyncSelect is NOT supported, cause it requires WinMain as its entrance
 
@@ -25,14 +25,6 @@ Note: WSAAsyncSelect is NOT supported, cause it requires WinMain as its entrance
 ### JAR
 
 Build, then import the generated Jar
-
-### Maven
-
-// TODO
-
-### Gradle
-
-// TODO
 
 ## Build
 
@@ -44,7 +36,7 @@ Gradle will download essential packages and build, output is `library/build/libs
 
 ## Examples
 
-// TODO
+see [examples](./examples)
 
 ## Documentation
 
@@ -52,8 +44,8 @@ see [jeffreystoke.github.io/winsock-jni](https://jeffreystoke.github.io/winsock-
 
 ## Note
 
-- support Windows Platform only
-- support VisualCpp toolchain only
+- Windows Platform only
+- VisualCpp for native toolchain only
 
 ## LICENSE
 

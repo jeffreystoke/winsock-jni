@@ -16,21 +16,45 @@
 
 package com.github.jeffreystoke.winsock.io.model
 
+import com.github.jeffreystoke.winsock.io.constant.NetEvent
 import com.github.jeffreystoke.winsock.io.internal.WinSock
-import com.github.jeffreystoke.winsock.io.struct.FdSet
 import com.github.jeffreystoke.winsock.io.struct.Socket
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
-class SelectModel(private val readFdSet: FdSet = FdSet(),
-                  private val writeFdSet: FdSet = FdSet(),
-                  private val exceptionFdSet: FdSet = FdSet()) {
+class SelectModel(private val reads: MutableList<Socket> = ArrayList(),
+                  private val writes: MutableList<Socket> = ArrayList(),
+                  private val exceptions: MutableList<Socket> = ArrayList()) {
 
     /**
      * 开始一次 select
      *
      * @param timeout 等待超时时间
      */
-    fun run(timeout: Int): Int {
-        return WinSock._select(readFdSet.getPtr(), writeFdSet.getPtr(), exceptionFdSet.getPtr(), timeout)
+    @Throws(RuntimeException::class)
+    fun select(timeout: Int): Socket? {
+        val netEventBuf = ByteArray(8)
+        val ret = WinSock._select(LongArray(reads.size, { reads[it].getPtr() }),
+                LongArray(writes.size, { writes[it].getPtr() }),
+                LongArray(exceptions.size, { exceptions[it].getPtr() }), timeout, netEventBuf)
+        if (ret < 1) {
+            throw RuntimeException("select failed $ret")
+        }
+
+        val netEvent = ByteBuffer.wrap(netEventBuf).order(ByteOrder.LITTLE_ENDIAN).long.and(0xFF)
+        val event = when (netEvent) {
+            NetEvent.FD_READ.value -> NetEvent.FD_READ
+            NetEvent.FD_WRITE.value -> NetEvent.FD_WRITE
+            NetEvent.FD_CLOSE.value -> NetEvent.FD_CLOSE
+            else -> {
+                throw RuntimeException("unknown net event")
+            }
+        }
+
+        return Socket.getSocket(ret)?.let {
+            it.selectEvent = event
+            it
+        }
     }
 
     /**
@@ -39,7 +63,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun addReadSocket(s: Socket) {
-        readFdSet.add(s)
+        reads.add(s)
     }
 
     /**
@@ -48,7 +72,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun addWriteSocket(s: Socket) {
-        writeFdSet.add(s)
+        writes.add(s)
     }
 
     /**
@@ -57,7 +81,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun addExceptionSocket(s: Socket) {
-        exceptionFdSet.add(s)
+        exceptions.add(s)
     }
 
     /**
@@ -66,7 +90,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun removeReadSocket(s: Socket) {
-        readFdSet.remove(s)
+        reads.remove(s)
     }
 
     /**
@@ -75,7 +99,7 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun removeWriteSocket(s: Socket) {
-        writeFdSet.remove(s)
+        writes.remove(s)
     }
 
     /**
@@ -84,42 +108,6 @@ class SelectModel(private val readFdSet: FdSet = FdSet(),
      * @param s Socket
      */
     fun removeExceptionSocket(s: Socket) {
-        exceptionFdSet.remove(s)
-    }
-
-    /**
-     * 获取发生读(接收)事件的 Socket
-     *
-     * @return Socket
-     */
-    fun getReadSetSocket(): Socket? {
-        return readFdSet.getSetFd()
-    }
-
-    /**
-     * 获取发生写(发送)事件的 Socket
-     *
-     * @return Socket
-     */
-    fun getWriteSetSocket(): Socket? {
-        return writeFdSet.getSetFd()
-    }
-
-    /**
-     * 获取发生出错事件的 Socket
-     *
-     * @return socket
-     */
-    fun getExceptionSetSocket(): Socket? {
-        return exceptionFdSet.getSetFd()
-    }
-
-    /**
-     * 清空内部所有 Socket
-     */
-    fun clear() {
-        readFdSet.destroy()
-        writeFdSet.destroy()
-        exceptionFdSet.destroy()
+        exceptions.remove(s)
     }
 }
