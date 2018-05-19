@@ -134,19 +134,18 @@ public class WinSock {
     public static native long _wsa_socket(int addressFamily, int socketType, int proto, int flag);
 
     // WSARecv()
-    public static native int _wsa_recv(long s, int bufSize, long overlappedStruct);
+    public static native long _wsa_recv(long s, int bufSize, long event);
 
     // WSASend()
-    public static native int _wsa_send(long s, byte[] data, long overlappedStruct);
+    public static native long _wsa_send(long s, byte[] data, long event);
 
     public static native long _create_completion_key(long socket, String remoteAddress, int port);
 
     public static native void _destroy_completion_key(long keyPtr);
 
-    public static native long _create_wsa_overlapped(long wsaEvent);
+    public static native int _wsa_get_overlapped_result(long s, long overlapped, boolean wait, long flag);
 
-    public static native int _wsa_get_overlapped_result(long s, long wsaOverlapped, boolean wait, long flag);
-
+    // CreateIoCompletionPort
     public static native long _create_iocp(long socket, long existingCP, long completionKey);
 
     public static native int _create_server_thread(long cp);

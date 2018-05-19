@@ -4,7 +4,7 @@ import com.github.jeffreystoke.winsock.io.struct.Socket;
 
 public abstract class Server extends Thread {
 
-    protected Socket mServerSocket = new Socket();
+    protected Socket mServerSocket;
 
     protected abstract String getTag();
 

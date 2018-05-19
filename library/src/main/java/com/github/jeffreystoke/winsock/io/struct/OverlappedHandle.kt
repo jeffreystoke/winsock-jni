@@ -16,17 +16,12 @@
 
 package com.github.jeffreystoke.winsock.io.struct
 
-import com.github.jeffreystoke.winsock.io.internal.WinSock
-import com.github.jeffreystoke.winsock.io.util.isNull
+import com.github.jeffreystoke.winsock.io.util.Pointer
 
-class WSAOverlapped(val wsaEvent: WSAEvent) : Struct() {
-
+class OverlappedHandle(ptr: Pointer) : Struct() {
 
     init {
-        _ptr = WinSock._create_wsa_overlapped(wsaEvent.getPtr())
-        if (_ptr.isNull()) {
-            throw RuntimeException("无法创建 WSAOverlapped 结构")
-        }
+        _ptr = ptr
     }
 
 }

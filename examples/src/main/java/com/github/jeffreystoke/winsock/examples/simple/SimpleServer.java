@@ -31,7 +31,9 @@ public class SimpleServer extends Server {
 
     @Override
     public void run() {
-        super.run();
+        mServerSocket = new Socket();
+        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
+        mServerSocket.listen();
 
         try {
             Socket client = mServerSocket.accept();

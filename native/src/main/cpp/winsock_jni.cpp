@@ -425,7 +425,7 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(
         wTime->tv_sec = waitTimeout / 1000;
         wTime->tv_usec = waitTimeout % 1000;
     }
-    
+
     // start select
     int ret = select(sizeof(rfds) * 8 * 3, &rfds, &wfds, &efds, wTime);
     delete wTime;
@@ -771,16 +771,21 @@ DWORD WINAPI ServerWorkerThread(LPVOID cp)
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
-    JNIEnv *env, jclass clazz, jlong socket, jint bufSize, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jint bufSize, jlong event)
 {
     io_op_body_s *op_body = create_op_body(bufSize, IO_OP_READ);
 
     WSABUF buf;
     buf.buf = op_body->buf;
     buf.len = bufSize;
+    if (event != 0)
+    {
+        op_body->event = (WSAEVENT)event;
+    }
 
     DWORD flag = 0;
-    return WSARecv(static_cast<SOCKET>(socket), &buf, 1, nullptr, &flag, &op_body->overlapped, nullptr);
+    int ret = WSARecv(static_cast<SOCKET>(socket), &buf, 1, nullptr, &flag, &op_body->overlapped, nullptr);
+    return (jlong) op_body;
 }
 
 /*
@@ -790,18 +795,23 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
-    JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jlong event)
 {
     io_op_body_s *op_body = create_op_body(0, IO_OP_WRITE);
 
     int len = env->GetArrayLength(sendBuf);
     WSABUF buf;
     buf.buf = new char[len];
-    buf.len = len;
     env->GetByteArrayRegion(sendBuf, 0, len, reinterpret_cast<jbyte *>(buf.buf));
+    buf.len = len;
+    if (event != 0)
+    {
+        op_body->event = (WSAEVENT)event;
+    }
 
     DWORD flag = 0;
-    return WSASend(static_cast<SOCKET>(socket), &buf, 1, nullptr, flag, &op_body->overlapped, nullptr);
+    int ret = WSASend(static_cast<SOCKET>(socket), &buf, 1, nullptr, flag, &op_body->overlapped, nullptr);
+    return (jlong) op_body;
 }
 
 /*
@@ -847,9 +857,9 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapp
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
-    JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jboolean wait, jlong flag)
+    JNIEnv *env, jclass clazz, jlong socket, jlong olHandler, jboolean wait, jlong flag)
 {
-    io_op_body_s *body = (io_op_body_s *)overlapped;
+    io_op_body_s *body = (io_op_body_s *) olHandler;
     DWORD count = 0;
     if (WSAGetOverlappedResult(static_cast<SOCKET>(socket), &body->overlapped, &count, wait, reinterpret_cast<PDWORD>(flag)))
     {

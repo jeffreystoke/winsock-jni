@@ -24,10 +24,10 @@ public class SelectTest {
 
         selectServerT.start();
         Thread.sleep(1000);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             new SimpleClient().start();
         }
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         selectServerT.interrupt();
 
     }

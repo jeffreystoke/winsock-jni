@@ -22,6 +22,7 @@ import com.github.jeffreystoke.winsock.io.util.isNull
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.*
 
 
 class WSAEvent(val socket: Socket) : Struct() {
@@ -33,10 +34,32 @@ class WSAEvent(val socket: Socket) : Struct() {
         }
     }
 
+    val relatedReadOverlappedHandles = Vector<OverlappedHandle>()
+    val relatedWriteOverlappedHandles = Vector<OverlappedHandle>()
+
+    @Throws(IOException::class)
+    fun postRecv(size: Int): OverlappedHandle {
+        val ret = OverlappedHandle(WinSock._wsa_recv(socket.getPtr(), size, _ptr))
+        relatedReadOverlappedHandles.addElement(ret)
+        return ret
+    }
+
+    @Throws(IOException::class)
+    fun postRecv(): OverlappedHandle {
+        return postRecv(1024)
+    }
+
+    @Throws(IOException::class)
+    fun postSend(data: ByteArray): OverlappedHandle {
+        val ret = OverlappedHandle(WinSock._wsa_send(socket.getPtr(), data, _ptr))
+        relatedWriteOverlappedHandles.addElement(ret)
+        return ret
+    }
+
     /**
      * 将状态设置为未传信
      */
-    @Throws(IOException::class)
+    @Throws(RuntimeException::class)
     fun reset() {
         if (!WinSock._wsa_reset_event(_ptr)) throw IOException("执行 WSARestEvent 失败")
     }
@@ -44,7 +67,7 @@ class WSAEvent(val socket: Socket) : Struct() {
     /**
      * 关闭事件，不再有效
      */
-    @Throws(IOException::class)
+    @Throws(RuntimeException::class)
     fun close() {
         if (!WinSock._wsa_close_event(_ptr)) throw IOException("执行 WSACloseEvent 失败")
     }

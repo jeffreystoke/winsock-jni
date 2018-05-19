@@ -22,8 +22,6 @@ import com.github.jeffreystoke.winsock.examples.WSAServer;
 import com.github.jeffreystoke.winsock.io.model.CompletionPortModel;
 import com.github.jeffreystoke.winsock.io.struct.CompletionKey;
 import com.github.jeffreystoke.winsock.io.struct.Socket;
-import com.github.jeffreystoke.winsock.io.struct.WSAEvent;
-import com.github.jeffreystoke.winsock.io.struct.WSAOverlapped;
 import com.github.jeffreystoke.winsock.io.util.UtilKt;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,17 +36,17 @@ public class IOCPServer extends WSAServer implements CompletionPortModel.Callbac
 
     @Override
     public void onSent(@NotNull Socket socket) {
-        println("onSent");
+//        println("onSent");
     }
 
     @Override
     public void onClose(@NotNull Socket socket) {
-        println("onClose");
+//        println("onClose");
     }
 
     @Override
     public void onError(@NotNull Socket socket) {
-        println("onError");
+//        println("onError");
     }
 
     @Override
@@ -73,10 +71,8 @@ public class IOCPServer extends WSAServer implements CompletionPortModel.Callbac
                     Socket client = mServerSocket.accept();
                     println("client connected");
                     cpm.create(new CompletionKey(client));
-                    WSAEvent event = new WSAEvent(client);
-                    WSAOverlapped overlapped = new WSAOverlapped(event);
-                    client.postSend(Constants.sMessage.getBytes(), overlapped);
-                    client.postRecv(overlapped);
+                    client.postSend(Constants.sMessage.getBytes());
+                    client.postRecv();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

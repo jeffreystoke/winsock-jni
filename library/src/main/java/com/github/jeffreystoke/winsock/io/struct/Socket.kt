@@ -176,18 +176,18 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
     }
 
     @Throws(IOException::class)
-    fun postRecv(size: Int, overlapped: WSAOverlapped): Int {
-        return WinSock._wsa_recv(_ptr, size, overlapped.getPtr())
+    fun postRecv(size: Int): OverlappedHandle {
+        return OverlappedHandle(WinSock._wsa_recv(_ptr, size, 0))
     }
 
     @Throws(IOException::class)
-    fun postRecv(overlapped: WSAOverlapped): Int {
-        return postRecv(1024, overlapped)
+    fun postRecv(): OverlappedHandle {
+        return postRecv(1024)
     }
 
     @Throws(IOException::class)
-    fun postSend(data: ByteArray, overlapped: WSAOverlapped): Int {
-        return WinSock._wsa_send(_ptr, data, overlapped.getPtr())
+    fun postSend(data: ByteArray): OverlappedHandle {
+        return OverlappedHandle(WinSock._wsa_send(_ptr, data, 0))
     }
 
     override fun equals(other: Any?): Boolean {

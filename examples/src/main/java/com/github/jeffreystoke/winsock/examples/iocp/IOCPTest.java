@@ -8,10 +8,10 @@ public class IOCPTest {
 
         serverT.start();
         Thread.sleep(1000);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             new SimpleClient().start();
         }
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         serverT.interrupt();
     }
 }

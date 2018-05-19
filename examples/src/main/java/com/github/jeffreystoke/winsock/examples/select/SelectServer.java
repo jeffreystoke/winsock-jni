@@ -33,6 +33,7 @@ public class SelectServer extends Server {
 
     @Override
     public void run() {
+        mServerSocket = new Socket();
         mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
         mServerSocket.listen();
 

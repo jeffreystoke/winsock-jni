@@ -11,7 +11,7 @@ public class OverlappedTest {
         for (int i = 0; i < 10; i++) {
             new SimpleClient().start();
         }
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         serverT.interrupt();
     }
 }

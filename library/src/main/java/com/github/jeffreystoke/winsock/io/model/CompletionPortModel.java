@@ -20,7 +20,7 @@ import com.github.jeffreystoke.winsock.io.internal.WinSock;
 import com.github.jeffreystoke.winsock.io.struct.CompletionKey;
 import com.github.jeffreystoke.winsock.io.struct.Socket;
 import com.github.jeffreystoke.winsock.io.struct.Struct;
-import com.github.jeffreystoke.winsock.io.struct.WSAOverlapped;
+import com.github.jeffreystoke.winsock.io.struct.OverlappedHandle;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,7 +150,7 @@ public class CompletionPortModel extends Struct {
         }
     }
 
-    public Boolean postQueuedCompletionStatus(int bytes, CompletionKey completionKey, WSAOverlapped overlapped) {
+    public Boolean postQueuedCompletionStatus(int bytes, CompletionKey completionKey, OverlappedHandle overlapped) {
         return WinSock._post_queued_completion_status(get_ptr(), bytes, completionKey.getPtr(), overlapped.getPtr());
     }
 

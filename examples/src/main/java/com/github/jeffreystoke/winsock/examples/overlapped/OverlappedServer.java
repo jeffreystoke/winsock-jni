@@ -16,17 +16,44 @@
 
 package com.github.jeffreystoke.winsock.examples.overlapped;
 
+import com.github.jeffreystoke.winsock.examples.Constants;
 import com.github.jeffreystoke.winsock.examples.Server;
 import com.github.jeffreystoke.winsock.io.model.OverlappedModel;
+import com.github.jeffreystoke.winsock.io.struct.Socket;
 import com.github.jeffreystoke.winsock.io.struct.WSAEvent;
+import com.github.jeffreystoke.winsock.io.struct.WSASocket;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.util.Vector;
 
 public class OverlappedServer extends Server {
 
-    List<WSAEvent> events = new ArrayList<>();
+    private Vector<WSAEvent> mEvents = new Vector<>();
+    private OverlappedModel om = new OverlappedModel();
+
+    private Thread mIOHandler = new Thread(() -> {
+        while (true) {
+            if (interrupted()) {
+                break;
+            }
+
+            WSAEvent eve = null;
+
+            try {
+                eve = om.waitForMultipleEvents(mEvents, 0);
+            } catch (RuntimeException e) {
+
+            }
+
+            if (eve != null) {
+                eve.reset();
+            }
+
+            om.getOverlappedResult(eve.getSocket(),
+                    eve.getRelatedReadOverlappedHandles().lastElement(), false, 0);
+
+        }
+    });
 
     @Override
     protected String getTag() {
@@ -35,17 +62,21 @@ public class OverlappedServer extends Server {
 
     @Override
     public void run() {
-        super.run();
-        WSAEvent event = new WSAEvent(mServerSocket);
-        events.add(event);
+        mServerSocket = new WSASocket();
+        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
+        mServerSocket.listen();
 
-        OverlappedModel om = new OverlappedModel();
         while (true) {
             if (interrupted()) {
                 break;
             }
-            WSAEvent eve = om.waitForMultipleEvents(events, 0);
-            eve = om.waitForMultipleEvents(Collections.singletonList(eve), 0);
+
+            try {
+                Socket s = mServerSocket.accept();
+                mEvents.add(new WSAEvent(s));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

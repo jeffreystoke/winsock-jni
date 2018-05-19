@@ -21,7 +21,7 @@ import com.github.jeffreystoke.winsock.io.internal.WinSock
 import com.github.jeffreystoke.winsock.io.struct.WSAEvent
 import com.github.jeffreystoke.winsock.io.util.mergedEvent
 
-class EventSelectModel {
+open class EventSelectModel {
 
     /**
      * 开始一次 WSAEventSelect
