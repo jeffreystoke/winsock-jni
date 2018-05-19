@@ -41,6 +41,9 @@ public class OverlappedServer extends Server {
 
         OverlappedModel om = new OverlappedModel();
         while (true) {
+            if (interrupted()) {
+                break;
+            }
             WSAEvent eve = om.waitForMultipleEvents(events, 0);
             eve = om.waitForMultipleEvents(Collections.singletonList(eve), 0);
         }

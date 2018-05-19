@@ -20,39 +20,36 @@ package com.github.jeffreystoke.winsock.examples.iocp;
 import com.github.jeffreystoke.winsock.examples.Constants;
 import com.github.jeffreystoke.winsock.examples.WSAServer;
 import com.github.jeffreystoke.winsock.io.model.CompletionPortModel;
-import com.github.jeffreystoke.winsock.io.struct.*;
+import com.github.jeffreystoke.winsock.io.struct.CompletionKey;
+import com.github.jeffreystoke.winsock.io.struct.Socket;
+import com.github.jeffreystoke.winsock.io.struct.WSAEvent;
+import com.github.jeffreystoke.winsock.io.struct.WSAOverlapped;
+import com.github.jeffreystoke.winsock.io.util.UtilKt;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-public class IOCPServer extends WSAServer {
+public class IOCPServer extends WSAServer implements CompletionPortModel.Callback {
 
-    private CompletionPortModel.Callback mCallback = new CompletionPortModel.Callback() {
-        @Override
-        public void onRecv(@NotNull Socket socket, @NotNull byte[] data) {
-            println("client message", new String(data));
-        }
+    @Override
+    public void onRecv(@NotNull Socket socket, @NotNull byte[] data) {
+        println("onRecv", new String(data));
+    }
 
-        @Override
-        public void onSend(@NotNull Socket socket) {
-            println("socket send", socket.getAddress());
-        }
+    @Override
+    public void onSent(@NotNull Socket socket) {
+        println("onSent");
+    }
 
-        @Override
-        public void onClose(@NotNull Socket socket) {
-            try {
-                socket.close();
-                socket.destroy();
-            } catch (IOException e) {
-                println("close error", e.getMessage());
-            }
-        }
+    @Override
+    public void onClose(@NotNull Socket socket) {
+        println("onClose");
+    }
 
-        @Override
-        public void onError(@NotNull Socket socket) {
-            println("socket error", socket.getAddress());
-        }
-    };
+    @Override
+    public void onError(@NotNull Socket socket) {
+        println("onError");
+    }
 
     @Override
     protected String getTag() {
@@ -61,23 +58,32 @@ public class IOCPServer extends WSAServer {
 
     @Override
     public void run() {
-        CompletionKey ck = new CompletionKey(mServerSocket);
-        CompletionPortModel cpm = new CompletionPortModel();
-        cpm.createServerThreads();
-        cpm.setCallback(mCallback);
-        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
-        mServerSocket.listen();
+        try {
+            CompletionPortModel cpm = new CompletionPortModel();
+            cpm.createServerThreads();
+            cpm.setCallback(this);
+            mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
+            mServerSocket.listen();
 
-        while (true) {
-            try {
-                WSASocket client = mServerSocket.accept();
-                cpm.create(new CompletionKey(client));
-                WSAEvent event = new WSAEvent(client);
-                WSAOverlapped overlapped = new WSAOverlapped(event);
-                client.wsaRecv(overlapped);
-            } catch (IOException e) {
-                e.printStackTrace();
+            while (true) {
+                if (interrupted()) {
+                    break;
+                }
+                try {
+                    Socket client = mServerSocket.accept();
+                    println("client connected");
+                    cpm.create(new CompletionKey(client));
+                    WSAEvent event = new WSAEvent(client);
+                    WSAOverlapped overlapped = new WSAOverlapped(event);
+                    client.postSend(Constants.sMessage.getBytes(), overlapped);
+                    client.postRecv(overlapped);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } finally {
+            UtilKt.wsaCleanup();
         }
+
     }
 }

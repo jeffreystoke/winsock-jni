@@ -41,16 +41,22 @@ public class EventSelectServer extends Server {
 
     @Override
     public void run() {
-        super.run();
+        mServerSocket.bind(Constants.sListenAddress, Constants.sListenPort);
+        mServerSocket.listen();
 
         WSAEvent event = new WSAEvent(mServerSocket);
         events.add(event);
 
         EventSelectModel esm = new EventSelectModel();
-        esm.run(event, FD_ACCEPT, FD_CLOSE);
+        esm.bind(event, FD_ACCEPT, FD_CLOSE);
         while (true) {
             WSAEvent eve = esm.waitForMultipleEvents(events, 0);
+            if (eve == null) {
+                continue;
+            }
             eve = esm.waitForMultipleEvents(Collections.singletonList(eve), 0);
+
+
             NetEvent ne;
             try {
                 ne = eve.getNetEvent();
@@ -66,7 +72,7 @@ public class EventSelectServer extends Server {
                     client = mServerSocket.accept();
                     println("client connected");
                     WSAEvent ce = new WSAEvent(client);
-                    esm.run(ce, FD_READ, FD_CLOSE);
+                    esm.bind(ce, FD_READ, FD_CLOSE);
                     events.add(ce);
                     println("client added to event list");
                     client.send(Constants.sMessage.getBytes());

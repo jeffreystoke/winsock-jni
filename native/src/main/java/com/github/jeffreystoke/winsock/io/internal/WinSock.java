@@ -142,7 +142,7 @@ public class WinSock {
     public static native long _wsa_socket(int addressFamily, int socketType, int proto, int flag);
 
     // WSARecv()
-    public static native int _wsa_recv(long s, byte[] buffer, long overlappedStruct);
+    public static native int _wsa_recv(long s, int bufSize, long overlappedStruct);
 
     // WSASend()
     public static native int _wsa_send(long s, byte[] data, long overlappedStruct);
@@ -155,7 +155,7 @@ public class WinSock {
 
     public static native int _wsa_get_overlapped_result(long s, long wsaOverlapped, boolean wait, long flag);
 
-    public static native long _create_iocp(long fileHandle, long existingCP, long completionKey);
+    public static native long _create_iocp(long socket, long existingCP, long completionKey);
 
     public static native int _create_server_thread(long cp);
 

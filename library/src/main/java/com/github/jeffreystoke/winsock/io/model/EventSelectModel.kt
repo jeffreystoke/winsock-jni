@@ -32,7 +32,7 @@ class EventSelectModel {
      *
      * @return Int
      */
-    fun run(event: WSAEvent, vararg caredNetEvents: NetEvent): Int =
+    fun bind(event: WSAEvent, vararg caredNetEvents: NetEvent): Int =
             WinSock._wsa_event_select(event.socket.getPtr(), event.getPtr(), caredNetEvents.mergedEvent())
 
     /**
@@ -43,10 +43,16 @@ class EventSelectModel {
      *
      * @return WSAEvent 发生事件的对象
      */
-    fun waitForMultipleEvents(events: List<WSAEvent>, waitTimeout: Int): WSAEvent {
-        val index = WinSock._wsa_wait_for_multiple_events(events.size,
+    @Throws(RuntimeException::class)
+    fun waitForMultipleEvents(events: List<WSAEvent>, waitTimeout: Int): WSAEvent? {
+        val ret = WinSock._wsa_wait_for_multiple_events(events.size,
                 LongArray(events.size, { i -> events[i].getPtr() }),
                 false, waitTimeout, false)
+        val index = ret - WinSock.WSA_WAIT_EVENT_0
+        if (index > events.size) {
+            return null
+        }
+
         return events[index - WinSock.WSA_WAIT_EVENT_0]
     }
 }

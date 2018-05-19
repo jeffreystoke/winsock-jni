@@ -1,10 +1,10 @@
 package com.github.jeffreystoke.winsock.examples;
 
-import com.github.jeffreystoke.winsock.io.struct.WSASocket;
+import com.github.jeffreystoke.winsock.io.struct.Socket;
 
 public abstract class WSAServer extends Thread {
 
-    protected WSASocket mServerSocket = new WSASocket();
+    protected Socket mServerSocket = new Socket();
 
     protected abstract String getTag();
 

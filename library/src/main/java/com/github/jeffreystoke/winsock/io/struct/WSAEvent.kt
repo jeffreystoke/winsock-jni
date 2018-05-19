@@ -21,6 +21,7 @@ import com.github.jeffreystoke.winsock.io.internal.WinSock
 import com.github.jeffreystoke.winsock.io.util.isNull
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 
 class WSAEvent(val socket: Socket) : Struct() {
@@ -60,10 +61,10 @@ class WSAEvent(val socket: Socket) : Struct() {
             throw IOException("调用 WSAEnumNetworkEvents 失败")
         }
 
-        val netEvent = ByteBuffer.wrap(bufForLong).long
+        val netEvent = ByteBuffer.wrap(bufForLong).order(ByteOrder.LITTLE_ENDIAN).long.and(0xFF)
         val netErrors = ByteBuffer.wrap(bufForInt)
         val netErrorArray = Array(10, { 0 })
-        for (i in 0..40 step 4) {
+        for (i in 0..36 step 4) {
             netErrorArray[i / 4] = netErrors.getInt(i)
         }
 

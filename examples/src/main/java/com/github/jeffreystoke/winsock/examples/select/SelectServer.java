@@ -38,6 +38,10 @@ public class SelectServer extends Server {
         SelectModel sm = new SelectModel();
         sm.addReadSocket(mServerSocket);
         while (true) {
+            if (interrupted()) {
+                break;
+            }
+
             if (sm.run(0) < 1) {
                 println("select failed");
                 break;

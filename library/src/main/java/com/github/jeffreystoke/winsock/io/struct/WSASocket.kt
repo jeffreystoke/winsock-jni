@@ -16,43 +16,27 @@
 
 package com.github.jeffreystoke.winsock.io.struct
 
+import com.github.jeffreystoke.winsock.io.constant.AddressFamily
+import com.github.jeffreystoke.winsock.io.constant.ProtocolType
+import com.github.jeffreystoke.winsock.io.constant.SocketFlag
+import com.github.jeffreystoke.winsock.io.constant.SocketType
 import com.github.jeffreystoke.winsock.io.internal.WinSock
+import com.github.jeffreystoke.winsock.io.util.Pointer
 import com.github.jeffreystoke.winsock.io.util.isNull
 
-class FdSet(socketList: List<Socket> = emptyList()) : Struct() {
+class WSASocket(addressFamily: AddressFamily = AddressFamily.Internet,
+                type: SocketType = SocketType.Stream,
+                protocol: ProtocolType = ProtocolType.TCP,
+                flag: SocketFlag = SocketFlag.WSA_FLAG_OVERLAPPED) : Socket() {
+
+    private constructor(ptr: Pointer) : this() {
+        _ptr = ptr
+    }
 
     init {
-        if (socketList.isNotEmpty()) {
-            socketList.forEach { s ->
-                add(s)
-            }
-        }
-    }
-
-    fun add(socket: Socket) {
+        _ptr = WinSock._wsa_socket(addressFamily.value, type.value, protocol.value, flag.value)
         if (_ptr.isNull()) {
-            _ptr = WinSock._create_fd_set()
-            if (_ptr.isNull()) {
-                throw RuntimeException("无法创建 FD_SET")
-            }
+            throw RuntimeException("无发创建 WSASocket")
         }
-
-        WinSock._add_fd(_ptr, socket.getPtr())
-    }
-
-    fun remove(socket: Socket) {
-        if (_ptr.isNull()) {
-            return
-        }
-
-        WinSock._remove_fd(_ptr, socket.getPtr())
-    }
-
-    fun getSetFd(): Socket? {
-        if (_ptr.isNull()) {
-            return null
-        }
-
-        return Socket(WinSock._get_set_fd(_ptr))
     }
 }

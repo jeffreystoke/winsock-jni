@@ -27,6 +27,14 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
                   type: SocketType = SocketType.Stream,
                   protocol: ProtocolType = ProtocolType.TCP) : Struct() {
 
+    companion object {
+        private val sSockets by lazy { HashMap<Pointer, Socket>() }
+
+        internal fun getSocket(ptr: Pointer): Socket? {
+            return sSockets[ptr]
+        }
+    }
+
     var address: String = ""
     var port: Int = 0
 
@@ -162,6 +170,21 @@ open class Socket(addressFamily: AddressFamily = AddressFamily.Internet,
         if (ret == SocketError.Error.value.toInt()) {
             throw IOException("调用 setsockopt 失败")
         }
+    }
+
+    @Throws(IOException::class)
+    fun postRecv(size: Int, overlapped: WSAOverlapped): Int {
+        return WinSock._wsa_recv(_ptr, size, overlapped.getPtr())
+    }
+
+    @Throws(IOException::class)
+    fun postRecv(overlapped: WSAOverlapped): Int {
+        return postRecv(1024, overlapped)
+    }
+
+    @Throws(IOException::class)
+    fun postSend(data: ByteArray, overlapped: WSAOverlapped): Int {
+        return WinSock._wsa_send(_ptr, data, overlapped.getPtr())
     }
 
     override fun equals(other: Any?): Boolean {

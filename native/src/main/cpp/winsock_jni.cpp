@@ -392,7 +392,7 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1add_1fd(
     JNIEnv *env, jclass clazz, jlong fdset, jlong socket)
 {
-    FD_SET(static_cast<SOCKET>(socket), (fd_set *)fdset);
+    FD_SET((SOCKET)socket, (fd_set *)fdset);
 }
 
 /*
@@ -438,10 +438,34 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1select(
     JNIEnv *env, jclass clazz, jlong readFds, jlong writeFds, jlong exceptionFds, jint waitTimeout)
 {
-    timeval wTime{};
-    wTime.tv_sec = waitTimeout / 1000;
-    wTime.tv_usec = (waitTimeout - wTime.tv_sec * 1000) / 100;
-    return select(0, (fd_set *)readFds, (fd_set *)writeFds, (fd_set *)exceptionFds, &wTime);
+
+    timeval *wTime = new timeval{};
+    if (waitTimeout == 0)
+    {
+        // delete wTime;
+        wTime = nullptr;
+    }
+    else
+    {
+        wTime->tv_sec = waitTimeout / 1000;
+        wTime->tv_usec = waitTimeout % 1000;
+    }
+
+    // int len = env->GetArrayLength(readFds);
+    // jlong * c_read_fds = env->GetLongArrayElements(readFds, nullptr);
+    // fd_set rfds;
+    // FD_ZERO(&rfds);
+    // for (int i = 0; i < len; ++i) {
+    //     FD_SET(c_read_fds[i], &rfds);
+    // }
+    // return select(0, (fd_set *)readFds, (fd_set *)writeFds, (fd_set *)exceptionFds, &wTime);
+    fd_set *rfds = (fd_set *)readFds;
+    printf("rfds addr: %p\n", rfds);
+    int ret = select(sizeof(((fd_set *)readFds)) * 8, (fd_set *)readFds, nullptr, nullptr, wTime);
+    printf("retval %d\n", ret);
+    delete wTime;
+
+    return ret;
 }
 
 /*
@@ -563,6 +587,161 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1socket(
     return (jlong)WSASocket(af, type, protocol, nullptr, 0, flag);
 }
 
+#define TIMEOUT_VAL 100
+
+// self defined completion key
+typedef struct _io_op_head
+{
+    SOCKET socket;
+    char *address;
+    int port;
+} io_op_head_s;
+
+io_op_head_s *create_op_head(JNIEnv *env, SOCKET socket, jstring address, int port)
+{
+    io_op_head_s *ret = new io_op_head_s{};
+    int len = env->GetStringUTFLength(address);
+    const char *c_addr = env->GetStringUTFChars(address, nullptr);
+    ret->address = new char[len];
+    memcpy(ret->address, c_addr, len);
+    env->ReleaseStringUTFChars(address, c_addr);
+    ret->socket = socket;
+    ret->port = port;
+    return ret;
+}
+
+void destroy_op_head(io_op_head_s *head)
+{
+    if (head != nullptr)
+    {
+        delete head->address;
+        delete head;
+    }
+}
+
+typedef enum _io_op_type {
+    IO_OP_READ = 0,
+    IO_OP_WRITE = 1,
+    IO_OP_CLOSE = 2,
+    IO_OP_ERROR = 3,
+} io_op_type_e;
+
+// self defined overlapped
+typedef struct _io_op_body
+{
+    OVERLAPPED overlapped; // overlapped
+    WSAEVENT event;        // event
+    io_op_type_e opType;   // operation type
+    char *buf;             // actual buffer
+    int len;               // buffer size
+} io_op_body_s;
+
+static JavaVM *jvm;
+static jclass mCompletionPortModelClass;
+static jmethodID mOnMessageMethod;
+
+io_op_body_s *create_op_body(int size, io_op_type_e opType)
+{
+    io_op_body_s *ret = new io_op_body_s{};
+    ret->buf = new char[size];
+    ret->opType = opType;
+    return ret;
+}
+
+void destroy_op_body(io_op_body_s *op_body)
+{
+    if (op_body != nullptr)
+    {
+        delete op_body->buf;
+        delete op_body;
+    }
+}
+
+/*
+ * 服务线程 
+ */
+DWORD WINAPI ServerWorkerThread(LPVOID cp)
+{
+    DWORD count = 0;
+    io_op_head_s *op_head;
+    io_op_body_s *op_body;
+    while (TRUE)
+    {
+        count = 0;
+        op_body = nullptr;
+        if (GetQueuedCompletionStatus((HANDLE)cp, &count, (PULONG_PTR)&op_head,
+                                      (LPOVERLAPPED *)&op_body, TIMEOUT_VAL))
+        {
+            // success
+            JNIEnv *g_env;
+            jvm->AttachCurrentThread((void **)&g_env, NULL);
+            if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
+            {
+                jvm->DetachCurrentThread();
+                continue;
+            }
+
+            if (count == 0)
+            {
+                printf("[NET] closed\n");
+                // connection closed
+                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
+                                            mOnMessageMethod, (jlong)cp,
+                                            (jlong)op_head, (jint)IO_OP_CLOSE, nullptr);
+                jvm->DetachCurrentThread();
+                continue;
+            }
+            else
+            {
+                printf("[NET] event %d\n", op_body->opType);
+                jbyteArray ret = g_env->NewByteArray(count);
+                g_env->SetByteArrayRegion(ret, 0, count, reinterpret_cast<jbyte *>(op_body->buf));
+                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
+                                            mOnMessageMethod, (jlong)cp,
+                                            (jlong)op_head, (jint)op_body->opType, ret);
+                jvm->DetachCurrentThread();
+
+                // destroy_op_body(op_body);
+            }
+        }
+
+        // failed
+        DWORD err = GetLastError();
+        if (err == WAIT_TIMEOUT)
+        {
+            // timeout, that's ok
+            // printf("[NET] wait timeout");
+            continue;
+        }
+        else if (op_body != nullptr)
+        {
+            // io error, oops
+            // destroy_op_body(op_body);
+            
+            JNIEnv *g_env;
+            jvm->AttachCurrentThread((void **)&g_env, NULL);
+            printf("[NET] error %d\n", err);
+            if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
+            {
+                jvm->DetachCurrentThread();
+                continue;
+            }
+            g_env->CallStaticVoidMethod(mCompletionPortModelClass,
+                                        mOnMessageMethod, (jlong)cp,
+                                        (jlong)op_head,
+                                        (jint)IO_OP_ERROR, nullptr);
+            jvm->DetachCurrentThread();
+        }
+        else
+        {
+            // other error, ooooooops
+            printf("fatal error, exit thread: %d", err);
+            break;
+        }
+    }
+    return 0;
+}
+
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
  * Method:    _wsa_recv
@@ -570,19 +749,16 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1socket(
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1recv(
-    JNIEnv *env, jclass clazz, jlong socket, jbyteArray recvBuf, jlong overlapped)
+    JNIEnv *env, jclass clazz, jlong socket, jint bufSize, jlong overlapped)
 {
-    WSABUF *buf = new WSABUF{};
-    buf->len = env->GetArrayLength(recvBuf);
-    buf->buf = new char[buf->len];
+    io_op_body_s *op_body = create_op_body(bufSize, IO_OP_READ);
+
+    WSABUF buf;
+    buf.buf = op_body->buf;
+    buf.len = bufSize;
+
     DWORD flag = 0;
-    int ret = WSARecv(static_cast<SOCKET>(socket), buf, 1, nullptr, &flag, (LPWSAOVERLAPPED)overlapped, nullptr);
-    env->SetByteArrayRegion(recvBuf, 0, buf->len, reinterpret_cast<jbyte *>(buf->buf));
-
-    delete buf->buf;
-    delete buf;
-
-    return ret;
+    return WSARecv(static_cast<SOCKET>(socket), &buf, 1, nullptr, &flag, &op_body->overlapped, nullptr);
 }
 
 /*
@@ -594,24 +770,17 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1send(
     JNIEnv *env, jclass clazz, jlong socket, jbyteArray sendBuf, jlong overlapped)
 {
-    WSABUF *buf = new WSABUF{};
-    buf->len = env->GetArrayLength(sendBuf);
-    buf->buf = new char[buf->len];
-    env->GetByteArrayRegion(sendBuf, 0, buf->len, reinterpret_cast<jbyte *>(buf->buf));
+    io_op_body_s *op_body = create_op_body(0, IO_OP_WRITE);
+
+    int len = env->GetArrayLength(sendBuf);
+    WSABUF buf;
+    buf.buf = new char[len];
+    buf.len = len;
+    env->GetByteArrayRegion(sendBuf, 0, len, reinterpret_cast<jbyte *>(buf.buf));
+
     DWORD flag = 0;
-    int ret = WSASend(static_cast<SOCKET>(socket), buf, 1, nullptr, flag, (LPWSAOVERLAPPED)overlapped, nullptr);
-
-    delete buf->buf;
-    delete buf;
-
-    return ret;
+    return WSASend(static_cast<SOCKET>(socket), &buf, 1, nullptr, flag, &op_body->overlapped, nullptr);
 }
-
-typedef struct _completion_key
-{
-    SOCKET s;
-    SOCKADDR_IN *remote_addr;
-} completion_key_s;
 
 /*
  * Class:     com_github_jeffreystoke_winsock_io_internal_WinSock
@@ -622,16 +791,7 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1completion_1key(
     JNIEnv *env, jclass clazz, jlong socket, jstring address, jint port)
 {
-    completion_key_s *key = new completion_key_s{};
-    key->s = static_cast<SOCKET>(socket);
-    sockaddr_in *sin = new sockaddr_in{};
-    sin->sin_family = AF_INET;
-    sin->sin_port = htons((u_short)port);
-    auto addr = env->GetStringUTFChars(address, nullptr);
-    sin->sin_addr.s_addr = inet_addr(addr);
-    env->ReleaseStringUTFChars(address, addr);
-    key->remote_addr = (SOCKADDR_IN *)sin;
-    return (jlong)key;
+    return (jlong)create_op_head(env, (SOCKET)socket, address, port);
 }
 
 /*
@@ -643,9 +803,7 @@ JNIEXPORT void JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1destroy_1completion_1key(
     JNIEnv *env, jclass clazz, jlong ptr)
 {
-    completion_key_s *key = (completion_key_s *)ptr;
-    delete key->remote_addr;
-    delete key;
+    destroy_op_head((io_op_head_s *)ptr);
 }
 
 /*
@@ -657,7 +815,7 @@ JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1wsa_1overlapped(
     JNIEnv *env, jclass clazz, jlong evnet)
 {
-    return (jlong) new WSAOVERLAPPED{};
+    return (jlong)create_op_body(0, IO_OP_READ);
 }
 
 /*
@@ -669,8 +827,9 @@ JNIEXPORT jint JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_1result(
     JNIEnv *env, jclass clazz, jlong socket, jlong overlapped, jboolean wait, jlong flag)
 {
+    io_op_body_s *body = (io_op_body_s *) overlapped;
     DWORD count = 0;
-    if (WSAGetOverlappedResult(static_cast<SOCKET>(socket), (LPWSAOVERLAPPED)overlapped, &count, wait, reinterpret_cast<PDWORD>(flag)))
+    if (WSAGetOverlappedResult(static_cast<SOCKET>(socket), &body->overlapped, &count, wait, reinterpret_cast<PDWORD>(flag)))
     {
         return count;
     }
@@ -684,106 +843,18 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1wsa_1get_1overlapped_
  */
 JNIEXPORT jlong JNICALL
 Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1iocp(
-    JNIEnv *env, jclass clazz, jlong socket, jlong otherCP, jlong completionKey, jint threadCount)
+    JNIEnv *env, jclass clazz, jlong socket, jlong otherCP, jlong completionKey)
 {
-    return (jlong)CreateIoCompletionPort((HANDLE)(ULONG_PTR)socket, (HANDLE)otherCP, (ULONG_PTR)completionKey, threadCount);
-}
-
-typedef enum _io_op_type {
-    IO_OP_READ = 0,
-    IO_OP_WRITE = 1,
-    IO_OP_CLOSE = 2,
-    IO_OP_ERROR = 3,
-} io_op_type_e;
-
-#define BUFFER_SIZE 1024
-#define TIMEOUT_VAL 100
-
-typedef struct _io_op_info
-{
-    OVERLAPPED overlapped;
-    WSABUF buf;
-    CHAR buffer[BUFFER_SIZE];
-    io_op_type_e opType;
-    INT len;
-} io_op_info_s;
-
-static JavaVM *jvm;
-static jclass mCompletionPortModelClass;
-static jmethodID mOnMessageMethod;
-
-/*
- * 服务线程 
- */
-DWORD WINAPI ServerWorkerThread(LPVOID cp)
-{
-    DWORD count = 0;
-    LPOVERLAPPED lpOverlapped;
-    completion_key_s *completion_key;
-    while (TRUE)
+    HANDLE ret = 0;
+    if (socket == 0)
     {
-        count = 0;
-        lpOverlapped = nullptr;
-        if (GetQueuedCompletionStatus((HANDLE)cp, &count,
-                                      (PULONG_PTR)&completion_key,
-                                      &lpOverlapped, TIMEOUT_VAL))
-        {
-            // success
-            if (count == 0)
-            {
-                // connection closed
-            }
-            io_op_info_s *op_info = CONTAINING_RECORD(lpOverlapped, io_op_info_s, overlapped);
-
-            JNIEnv *g_env;
-            jvm->AttachCurrentThread((void **)&g_env, NULL);
-            if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
-            {
-                continue;
-            }
-            else
-            {
-                int len = op_info->len;
-                op_info->len = 0;
-                jbyteArray ret = g_env->NewByteArray(len);
-                g_env->SetByteArrayRegion(ret, 0, len, reinterpret_cast<jbyte *>(op_info->buffer));
-                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
-                                            mOnMessageMethod, (jlong)cp,
-                                            (jlong)completion_key,
-                                            (jint)op_info->opType, ret);
-            }
-        }
-        else
-        {
-            // failed
-            DWORD err = GetLastError();
-            if (err == WAIT_TIMEOUT)
-            {
-                // timeout, that's ok
-                continue;
-            }
-            else if (lpOverlapped != nullptr)
-            {
-                // io error, oops
-                JNIEnv *g_env;
-                jvm->AttachCurrentThread((void **)&g_env, NULL);
-                if (g_env == NULL || mCompletionPortModelClass == NULL || mOnMessageMethod == 0)
-                {
-                    continue;
-                }
-                g_env->CallStaticVoidMethod(mCompletionPortModelClass,
-                                            mOnMessageMethod, (jlong)cp,
-                                            (jlong)completion_key,
-                                            (jint)IO_OP_ERROR, nullptr);
-            }
-            else
-            {
-                // other error, ooooooops
-                break;
-            }
-        }
+        ret = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
     }
-    return 0;
+    else
+    {
+        ret = CreateIoCompletionPort((HANDLE)socket, (HANDLE)otherCP, (ULONG_PTR)completionKey, 0);
+    }
+    return (jlong)ret;
 }
 
 /*
@@ -796,9 +867,10 @@ Java_com_github_jeffreystoke_winsock_io_internal_WinSock__1create_1server_1threa
     JNIEnv *env, jclass clazz, jlong cp)
 {
     env->GetJavaVM(&jvm);
+
     mCompletionPortModelClass = (jclass)env->NewGlobalRef(
         env->FindClass("com/github/jeffreystoke/winsock/io/model/CompletionPortModel"));
-    mOnMessageMethod = env->GetStaticMethodID(mCompletionPortModelClass, "onMessage", "(LLI[B)V");
+    mOnMessageMethod = env->GetStaticMethodID(mCompletionPortModelClass, "onMessage", "(JJI[B)V");
 
     HANDLE thread;
     DWORD thread_id;
